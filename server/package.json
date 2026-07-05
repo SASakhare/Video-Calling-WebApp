@@ -1,0 +1,14 @@
+{
+  "name": "cls",
+  "version": "1.0.0",
+  "description": "this is backend of video calling fullstack application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
