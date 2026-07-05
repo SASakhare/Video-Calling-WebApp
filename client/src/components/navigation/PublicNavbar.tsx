@@ -53,7 +53,7 @@ export function PublicNavbar() {
               </>
             )}
           </div>
-
+            {/* //* this button for small devices menu */}
           <button
             className="rounded-lg p-2 md:hidden"
             onClick={() => setOpen((v) => !v)}
@@ -64,6 +64,8 @@ export function PublicNavbar() {
         </div>
       </div>
 
+
+      {/* //* Animate Navbar for small devices */}
       <AnimatePresence>
         {open && (
           <motion.div

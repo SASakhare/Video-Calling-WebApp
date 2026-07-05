@@ -71,7 +71,7 @@ export default function MeetingSummary() {
   return (
     <div className="mx-auto max-w-5xl space-y-8 select-none">
       
-      {/* Header Banner */}
+      {/* //* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-brand p-8 text-primary-foreground shadow-brand md:p-10">
         <div className="pointer-events-none absolute inset-0 grid-dots opacity-20" />
         <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -95,7 +95,7 @@ export default function MeetingSummary() {
         </div>
       </div>
 
-      {/* Grid statistics summary */}
+      {/* //* Grid statistics summary */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
           { label: "Duration", value: `${data.durationMin} minutes`, icon: Clock },
@@ -143,7 +143,7 @@ export default function MeetingSummary() {
             </GlassCard>
           </section>
 
-          {/* Transcript preview panel */}
+          {/*//* Transcript preview panel */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold flex items-center gap-2">
@@ -168,10 +168,10 @@ export default function MeetingSummary() {
           </section>
         </div>
 
-        {/* Right Sidebar panels */}
+        {/* //* Right Sidebar panels */}
         <div className="space-y-6">
           
-          {/* Recording Player placeholder */}
+          {/* //*  Recording Player placeholder */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Play className="h-5 w-5 text-primary" />
@@ -188,7 +188,7 @@ export default function MeetingSummary() {
             </GlassCard>
           </section>
 
-          {/* Attendees Grid Panel list */}
+          {/* //* Attendees Grid Panel list */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />

@@ -34,6 +34,7 @@ export default function JoinMeeting() {
       const result = await meetingService.validateCode(code);
       toast.success("Meeting found — joining lobby");
       navigate(`/meetings/lobby/${result.meetingId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || "Invalid or expired meeting code");
     } finally {
@@ -106,7 +107,7 @@ export default function JoinMeeting() {
         </GlassCard>
       </motion.div>
 
-      {/* Recent meetings as quick-join */}
+      {/* //* Recent meetings as quick-join */}
       {recent.data && recent.data.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -140,7 +141,7 @@ export default function JoinMeeting() {
                       <p className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {m.durationMin}m
+                          {m.durationMin}
                         </span>
                         <span className="inline-flex items-center gap-1">
                           <Users className="h-3 w-3" />

@@ -137,7 +137,7 @@ export default function NotificationsPage() {
                         : "border-primary/20 bg-primary/[0.02]"
                     }`}
                   >
-                    {/* Left: icon + text */}
+                    {/* //* Left: icon + text */}
                     <div
                       onClick={() => handleAction(item.href, item.id)}
                       className={`flex gap-3 min-w-0 flex-1 ${item.href ? "cursor-pointer" : ""}`}
@@ -172,7 +172,7 @@ export default function NotificationsPage() {
                       </div>
                     </div>
 
-                    {/* Right: actions */}
+                    {/* //* Right: actions */}
                     <div className="flex gap-1 shrink-0">
                       {!item.read && (
                         <Button

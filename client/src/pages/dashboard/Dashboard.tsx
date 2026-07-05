@@ -32,18 +32,24 @@ export default function Dashboard() {
             <p className="mt-2 max-w-md text-primary-foreground/85">Start a new meeting, or jump into one scheduled for today.</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            {/* //* button for start new meeting */}
             <Button size="lg" variant="secondary" className="rounded-full" onClick={() => navigate("/meetings/new")}>
               <Plus className="mr-1.5 h-4 w-4" /> New meeting
             </Button>
+            
+            {/* //* button for join meeting */}
             <Button size="lg" variant="outline" className="rounded-full border-white/30 bg-white/10 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground" onClick={() => navigate("/meetings/join")}>
               <Video className="mr-1.5 h-4 w-4" /> Join with code
             </Button>
+
           </div>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* //* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+        {/* //* we have to change this stats from static to dynamics */}
         {[
           { label: "Meetings today", value: "3", icon: Calendar },
           { label: "Hours this week", value: "8.4", icon: Clock },
@@ -64,7 +70,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Personal room */}
+      {/* //* Personal room */}
       <GlassCard className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <Badge variant="outline" className="mb-2 rounded-full">Personal room</Badge>
@@ -72,17 +78,22 @@ export default function Dashboard() {
           <p className="mt-1 text-xs text-muted-foreground">Your always-on meeting URL. Share it once, use it forever.</p>
         </div>
         <div className="flex gap-2">
+
           <Button variant="outline" className="rounded-full" onClick={() => { navigator.clipboard.writeText(personalRoom); toast.success("Copied to clipboard"); }}>
             <Copy className="mr-1.5 h-4 w-4" /> Copy
           </Button>
+
           <Button className="rounded-full bg-gradient-brand text-primary-foreground btn-glow" onClick={() => navigate("/meetings/new")}>
             Start now <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
+
         </div>
       </GlassCard>
 
-      {/* Upcoming + Recent */}
+      {/* //* Upcoming + Recent */}
       <div className="grid gap-6 lg:grid-cols-2">
+
+        {/* //* Upcoming Events */}
         <section>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Upcoming</h2>
@@ -112,7 +123,9 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* //* Recent Events */}
         <section>
+
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent</h2>
             <Button variant="ghost" size="sm" onClick={() => navigate("/history")}>View all</Button>

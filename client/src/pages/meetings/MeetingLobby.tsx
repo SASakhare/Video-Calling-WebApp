@@ -80,7 +80,7 @@ export default function MeetingLobby() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-col items-center justify-center gap-8 px-4 py-8 lg:flex-row lg:gap-12">
-      {/* Left — Video preview */}
+      {/* //* Left — Video preview */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -117,6 +117,7 @@ export default function MeetingLobby() {
 
         {/* Controls */}
         <div className="flex items-center justify-center gap-2">
+          {/* //* mic toggle button */}
           <Button
             onClick={toggleMic}
             variant="outline"
@@ -134,6 +135,8 @@ export default function MeetingLobby() {
               <MicOff className="h-5 w-5" />
             )}
           </Button>
+
+        {/* // * Camera Toggle button */}
           <Button
             onClick={toggleCamera}
             variant="outline"
@@ -153,7 +156,7 @@ export default function MeetingLobby() {
           </Button>
         </div>
 
-        {/* Device selectors */}
+        {/* //* Device selectors */}
         <div className="grid gap-2 sm:grid-cols-2">
           <DeviceSelector
             kind="videoinput"
@@ -181,7 +184,7 @@ export default function MeetingLobby() {
         </div>
       </motion.div>
 
-      {/* Right — Meeting info & join */}
+      {/* //* Right — Meeting info & join */}
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -189,7 +192,7 @@ export default function MeetingLobby() {
         className="w-full max-w-md space-y-5"
       >
         <div className="glass-panel space-y-5 p-6">
-          {/* Meeting info */}
+          {/* //* Meeting info */}
           {meeting.isLoading ? (
             <div className="space-y-2">
               <div className="h-6 w-3/4 animate-shimmer rounded-lg" />
@@ -256,7 +259,7 @@ export default function MeetingLobby() {
             </div>
           )}
 
-          {/* Passcode input (if meeting requires one) */}
+          {/* //* Passcode input (if meeting requires one) */}
           {m?.passcode && (
             <div className="space-y-1.5">
               <Label
@@ -304,6 +307,7 @@ export default function MeetingLobby() {
         </div>
 
         {/* Ready status */}
+        
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
             {cameraOn && micOn

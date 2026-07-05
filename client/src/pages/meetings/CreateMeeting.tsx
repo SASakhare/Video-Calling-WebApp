@@ -56,6 +56,8 @@ export default function CreateMeeting() {
     },
   });
 
+
+  // * we have to update this function  for making new video call
   const handleInstant = async () => {
     setLoading(true);
     try {
@@ -126,7 +128,7 @@ export default function CreateMeeting() {
         </div>
       </div>
 
-      {/* Mode selector */}
+      {/* //* Mode selector */}
       <div className="flex gap-3">
         {[
           { key: "instant" as const, icon: Zap, label: "Instant meeting", desc: "Start right now" },
@@ -161,7 +163,7 @@ export default function CreateMeeting() {
         ))}
       </div>
 
-      {/* Instant mode */}
+      {/* //* Instant mode */}
       {mode === "instant" && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -193,7 +195,7 @@ export default function CreateMeeting() {
         </motion.div>
       )}
 
-      {/* Scheduled mode */}
+      {/* //* Scheduled mode */}
       {mode === "scheduled" && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}

@@ -29,7 +29,7 @@ const stats = [
 export default function Landing() {
   return (
     <>
-      {/* HERO */}
+      {/*//* HERO */}
       <section className="relative overflow-hidden hero-bg noise">
         <div className="pointer-events-none absolute inset-0 grid-dots opacity-30" />
         <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/15 blur-[140px]" />
@@ -50,32 +50,38 @@ export default function Landing() {
               crystal-clear video, effortless scheduling, and enterprise-grade security.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+
+              {/* //* register page */}
               <Button asChild size="lg" className="h-12 rounded-full bg-gradient-brand px-6 text-primary-foreground btn-glow">
                 <Link to="/register">Start for free <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
+
+              {/* //* meeting join page */}
               <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-border/70 px-6 backdrop-blur">
                 <Link to="/meetings/join"><Play className="mr-2 h-4 w-4" /> Join a meeting</Link>
               </Button>
+
             </div>
             <p className="mt-5 text-xs text-muted-foreground">
               No credit card · Free for up to 100 participants
             </p>
           </motion.div>
 
-          {/* Meeting preview */}
+          {/* //* Meeting preview */}
           <motion.div
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
             className="relative mx-auto mt-16 max-w-6xl"
           >
             <div className="absolute -inset-4 rounded-[2rem] bg-gradient-brand opacity-20 blur-3xl" />
             <div className="relative glass-panel overflow-hidden rounded-3xl p-2 shadow-xl">
+              {/* //* complete meeting preview */}
               <MeetingPreview />
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* LOGOS */}
+      {/* //* LOGOS */}
       <section className="border-y border-border/60 bg-muted/30 py-10">
         <div className="container">
           <p className="mb-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
@@ -89,7 +95,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* //* FEATURES */}
       <section className="py-24">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
@@ -124,7 +130,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* STATS */}
+      {/* //* STATS */}
       <section className="border-y border-border/60 bg-gradient-brand-soft py-16">
         <div className="container grid grid-cols-2 gap-8 md:grid-cols-4">
           {stats.map((s) => (
@@ -136,7 +142,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* SPLIT — chat & schedule */}
+      {/* // * SPLIT — chat & schedule */}
       <section className="py-24">
         <div className="container grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
@@ -168,7 +174,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* //* CTA */}
       <section className="py-24">
         <div className="container">
           <motion.div
@@ -185,12 +191,15 @@ export default function Landing() {
               Join thousands of teams already meeting better with Meetly.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {/* //* link to register page */}
               <Button asChild size="lg" variant="secondary" className="h-12 rounded-full px-6">
                 <Link to="/register">Get started free <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
+              {/* //* link to contact page */}
               <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/30 bg-white/10 px-6 text-primary-foreground backdrop-blur hover:bg-white/20 hover:text-primary-foreground">
                 <Link to="/contact">Talk to sales</Link>
               </Button>
+
             </div>
           </motion.div>
         </div>
@@ -223,7 +232,7 @@ function MeetingPreview() {
         6 participants
       </div>
 
-      {/* Grid */}
+      {/* //* Grid */}
       <div className="grid h-full grid-cols-3 gap-2 p-2">
         {tiles.map((t) => (
           <div key={t.name} className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${t.color} ${t.speaking ? "ring-2 ring-white/80" : ""}`}>
@@ -250,7 +259,7 @@ function MeetingPreview() {
         ))}
       </div>
 
-      {/* Control bar */}
+      {/* //* Control bar */}
       <div className="absolute inset-x-0 bottom-4 z-10 flex justify-center">
         <div className="flex items-center gap-1.5 rounded-2xl bg-black/50 p-1.5 backdrop-blur-xl">
           {[
@@ -267,9 +276,11 @@ function MeetingPreview() {
             </button>
           ))}
           <div className="mx-1 h-6 w-px bg-white/20" />
+
           <button className="flex h-10 items-center gap-1.5 rounded-xl bg-red-500 px-3 text-sm font-medium text-white hover:bg-red-600">
             <PhoneOff className="h-4 w-4" /> Leave
           </button>
+
         </div>
       </div>
     </div>
@@ -283,13 +294,17 @@ function ChatPreview() {
     { from: "You", text: "Good catch — let me pull it up.", side: "right" },
     { from: "Sam Okafor", text: "👏 nice work team", side: "left" },
   ];
+
+
   return (
     <div className="space-y-3">
+
       <div className="flex items-center gap-2 border-b border-border/60 pb-3">
         <MessageSquare className="h-4 w-4 text-primary" />
         <span className="text-sm font-semibold">Meeting chat</span>
         <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground"><Calendar className="h-3 w-3" /> live</span>
       </div>
+
       <div className="space-y-3">
         {msgs.map((m, i) => (
           <motion.div
@@ -300,6 +315,7 @@ function ChatPreview() {
               {m.side === "left" && <p className="text-[11px] font-medium text-muted-foreground">{m.from}</p>}
               {m.text}
             </div>
+            
           </motion.div>
         ))}
       </div>

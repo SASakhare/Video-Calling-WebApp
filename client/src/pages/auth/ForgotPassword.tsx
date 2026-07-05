@@ -21,6 +21,7 @@ export default function ForgotPassword() {
   const onSubmit = async (v: Values) => {
     setLoading(true);
     try { await authService.forgotPassword(v.email); setSent(true); toast.success("Reset link sent"); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
 

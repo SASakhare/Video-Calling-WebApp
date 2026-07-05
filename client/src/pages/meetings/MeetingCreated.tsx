@@ -21,6 +21,7 @@ export default function MeetingCreated() {
   const [inviteOpen, setInviteOpen] = useState(false);
 
   // Try state from navigation first, fall back to fetch
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const passedMeeting = (location.state as any)?.meeting;
 
   const fetched = useQuery({
@@ -111,7 +112,7 @@ export default function MeetingCreated() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      {/* Success hero */}
+      {/* //* Success hero */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -120,7 +121,7 @@ export default function MeetingCreated() {
       >
         <div className="pointer-events-none absolute inset-0 grid-dots opacity-20" />
 
-        {/* Celebration rings */}
+        {/* //* Celebration rings */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {[1, 2, 3].map((i) => (
             <motion.div
@@ -232,6 +233,7 @@ export default function MeetingCreated() {
         transition={{ delay: 0.25 }}
         className="grid gap-3 sm:grid-cols-2"
       >
+        {/* // *Copy Invitation */}
         <GlassCard
           hover
           onClick={copyInvite}
@@ -249,6 +251,8 @@ export default function MeetingCreated() {
             </div>
           </div>
         </GlassCard>
+
+        {/* // *Send Invitation */}
 
         <GlassCard
           hover
@@ -268,6 +272,8 @@ export default function MeetingCreated() {
           </div>
         </GlassCard>
 
+        {/* // *Download .ics */}
+
         <GlassCard
           hover
           onClick={downloadIcs}
@@ -286,6 +292,7 @@ export default function MeetingCreated() {
           </div>
         </GlassCard>
 
+        {/* // * Google Calendar */}
         <GlassCard
           hover
           onClick={openGoogleCal}
@@ -305,7 +312,7 @@ export default function MeetingCreated() {
         </GlassCard>
       </motion.div>
 
-      {/* Primary CTA */}
+      {/*//* Primary CTA */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}

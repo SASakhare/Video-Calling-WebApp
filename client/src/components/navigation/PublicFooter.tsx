@@ -52,6 +52,7 @@ export function PublicFooter() {
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               Premium video meetings for teams that care about craft.
             </p>
+            {/* //* public social media handle of company */}
             <div className="mt-5 flex gap-2">
               {[Twitter, Github, Linkedin].map((Icon, i) => (
                 <a key={i} href="#" aria-label="social" className="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary">
@@ -74,7 +75,10 @@ export function PublicFooter() {
               </ul>
             </div>
           ))}
+  
         </div>
+
+        {/* //* copyright and made for teams who ship */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 text-xs text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} {APP_NAME}. Crafted with care.</p>
           <p>Made for teams who ship.</p>

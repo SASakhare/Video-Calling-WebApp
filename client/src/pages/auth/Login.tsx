@@ -32,6 +32,7 @@ export default function Login() {
       setUser(user); setToken(token);
       toast.success(`Welcome back, ${user.name.split(" ")[0]}`);
       navigate("/dashboard");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       toast.error(e.message || "Login failed");
     } finally { setLoading(false); }

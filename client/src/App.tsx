@@ -44,7 +44,7 @@ export default function App() {
           <Toaster position="top-right" richColors closeButton />
           <BrowserRouter>
             <Routes>
-              {/* Public */}
+              {/* //* Public */}
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<Landing />} />
                 <Route path="/features" element={<Features />} />
@@ -53,7 +53,7 @@ export default function App() {
                 <Route path="/contact" element={<Contact />} />
               </Route>
 
-              {/* Auth */}
+              {/* //* Auth */}
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
@@ -62,7 +62,7 @@ export default function App() {
                 <Route path="/verify-email" element={<VerifyEmail />} />
               </Route>
 
-              {/* App */}
+              {/* //* App */}
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/meetings/new" element={<CreateMeeting />} />
@@ -78,12 +78,12 @@ export default function App() {
                 <Route path="/help" element={<Help />} />
               </Route>
 
-              {/* Live Meeting Layout Shell */}
+              {/* //* Live Meeting Layout Shell */}
               <Route element={<MeetingRoomLayout />}>
                 <Route path="/meetings/room/:id" element={<MeetingRoom />} />
               </Route>
 
-              {/* Errors */}
+              {/* //* Errors */}
               <Route path="/unauthorized" element={<ErrorPage code="401" title="Unauthorized" description="You don't have permission to view this page." />} />
               <Route path="/500" element={<ErrorPage code="500" title="Server error" description="Something went wrong on our end. We're on it." />} />
               <Route path="/404" element={<ErrorPage code="404" title="Not found" description="We couldn't find the page you were looking for." />} />

@@ -24,6 +24,7 @@ export default function ResetPassword() {
   const onSubmit = async (v: Values) => {
     setLoading(true);
     try { await authService.resetPassword("mock", v.password); toast.success("Password updated — sign in with your new password"); navigate("/login"); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
   };
 

@@ -36,7 +36,7 @@ export default function WaitingRoom() {
     stop,
   } = useMediaPreview();
 
-  // Auto-admit simulation
+  //* Auto-admit simulation
   useEffect(() => {
     const timer = setTimeout(() => {
       setAdmitted(true);
@@ -52,7 +52,7 @@ export default function WaitingRoom() {
     return () => clearTimeout(timer);
   }, [id, navigate, stop]);
 
-  // Elapsed counter
+  //* Elapsed counter
   useEffect(() => {
     const interval = setInterval(() => {
       setElapsed((e) => e + 1);
@@ -82,7 +82,7 @@ export default function WaitingRoom() {
         transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
         className="relative z-10 w-full max-w-md space-y-6 text-center"
       >
-        {/* Pulsing indicator */}
+        {/* //* Pulsing indicator */}
         <div className="relative mx-auto h-20 w-20">
           {!admitted ? (
             <>
@@ -118,7 +118,7 @@ export default function WaitingRoom() {
           )}
         </div>
 
-        {/* Status text */}
+        {/* //* Status text */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             {admitted ? "You've been admitted!" : "Waiting to be admitted"}
@@ -136,7 +136,7 @@ export default function WaitingRoom() {
           )}
         </div>
 
-        {/* Elapsed time */}
+        {/* //* Elapsed time */}
         {!admitted && (
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
@@ -144,7 +144,7 @@ export default function WaitingRoom() {
           </div>
         )}
 
-        {/* Self-view */}
+        {/*  //*Self-view */}
         {!admitted && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -160,7 +160,7 @@ export default function WaitingRoom() {
               className="mx-auto"
             />
 
-            {/* Controls */}
+            {/*//* Controls */}
             <div className="mt-3 flex items-center justify-center gap-2">
               <Button
                 onClick={toggleMic}
@@ -200,7 +200,7 @@ export default function WaitingRoom() {
           </motion.div>
         )}
 
-        {/* Leave button */}
+        {/* //* Leave button */}
         {!admitted && (
           <Button
             onClick={handleLeave}
