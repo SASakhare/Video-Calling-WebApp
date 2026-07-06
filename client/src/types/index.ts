@@ -1,12 +1,14 @@
 export type ID = string;
 
 export interface User {
-  id: ID;
-  name: string;
+  userId: ID;
+  firstName: string;
+  lastName:string;
   email: string;
+  company:string;
+  jobTitle:string
   avatar?: string;
   cover?: string;
-  role: "host" | "member" | "admin";
   title?: string;
   bio?: string;
   createdAt: string;

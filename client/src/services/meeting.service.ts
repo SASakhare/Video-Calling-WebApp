@@ -58,6 +58,7 @@ export const meetingService = {
     return m;
   },
   async create(input: Partial<Meeting>) {
+    // * we have create meeting here and then send the url
     await delay();
     const id = `m_${uid()}`;
     return { id, code: meetingCode(), ...input } as Meeting & { code: string };

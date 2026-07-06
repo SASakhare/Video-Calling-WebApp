@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,19 +21,20 @@ type Values = z.infer<typeof schema>;
 export default function Login() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const setUser = useAuthStore((s) => s.setUser);
-  const setToken = useAuthStore((s) => s.setToken);
+  const setUser = useAuthStore((state) => state.setUser)
   const navigate = useNavigate();
   const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { email: "", password: "" } });
 
   const onSubmit = async (v: Values) => {
     setLoading(true);
     try {
-      const { user, token } = await authService.login(v.email, v.password);
-      setUser(user); setToken(token);
-      toast.success(`Welcome back, ${user.name.split(" ")[0]}`);
+      setLoading(true);
+      const response = await authService.login(v.email, v.password);
+      setLoading(false);
+      setUser(response.data.user); 
+      console.log(useAuthStore.getState());
+
       navigate("/dashboard");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       toast.error(e.message || "Login failed");
     } finally { setLoading(false); }
@@ -79,3 +81,11 @@ export default function Login() {
     </div>
   );
 }
+function setToken(token: any) {
+  throw new Error("Function not implemented.");
+}
+
+function setUser(user: any) {
+  throw new Error("Function not implemented.");
+}
+

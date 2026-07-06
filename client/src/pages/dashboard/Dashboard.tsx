@@ -17,8 +17,8 @@ export default function Dashboard() {
   const upcoming = useQuery({ queryKey: ["meetings", "upcoming"], queryFn: meetingService.upcoming });
   const recent = useQuery({ queryKey: ["meetings", "recent"], queryFn: meetingService.recent });
 
-  const first = (user?.name || "there").split(" ")[0];
-  const personalRoom = `meetly.app/${(user?.name || "you").toLowerCase().replace(/\s+/g, "-")}`;
+  const first = (user?.firstName || "there").split(" ")[0];
+  const personalRoom = `meetly.app/${(user?.firstName || "you").toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">

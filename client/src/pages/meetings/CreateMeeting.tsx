@@ -69,9 +69,11 @@ export default function CreateMeeting() {
         participantsCount: 1,
       });
       toast.success("Meeting created!");
+      //* navigating to meeting created page
       navigate(`/meetings/created/${result.id}`, {
         state: { meeting: result },
       });
+      
     } catch {
       toast.error("Failed to create meeting");
     } finally {

@@ -10,7 +10,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { authService } from "@/services/auth.service";
+
+
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -29,11 +31,17 @@ export function AppSidebar() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
   const toggle = useUIStore((s) => s.toggleSidebar);
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+  const logout= useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
-  const initials = (user?.name || "U").split(" ").map((n) => n[0]).slice(0, 2).join("");
+  const initials = (user?.firstName || "U").split(" ").map((n) => n[0]).slice(0, 2).join("");
+  const handleLogout = async () => {
+    logout(); 
 
+    await authService.logout();
+
+    navigate("/");
+  }
   return (
     <aside
       className={cn(
@@ -86,7 +94,7 @@ export function AppSidebar() {
           </Avatar>
           {!collapsed && (
             <div className="min-w-0 text-left">
-              <p className="truncate text-sm font-medium group-hover:text-primary transition-colors">{user?.name || "Guest"}</p>
+              <p className="truncate text-sm font-medium group-hover:text-primary transition-colors">{user?.firstName || "Guest"}</p>
               <p className="truncate text-xs text-muted-foreground">{user?.email || ""}</p>
             </div>
           )}
@@ -96,7 +104,7 @@ export function AppSidebar() {
         {!collapsed && (
           <Button
             variant="ghost" size="icon" className="h-8 w-8 shrink-0"
-            onClick={() => { logout(); toast.success("Signed out"); navigate("/"); }}
+            onClick={ handleLogout}
             aria-label="Sign out"
             title="Sign out"
           >

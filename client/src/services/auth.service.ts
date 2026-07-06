@@ -1,26 +1,67 @@
 import type { User } from "@/types";
 import { delay, uid } from "./_mock";
+import { useAuthStore } from "@/store/auth.store";
+import env from "@/utils/environment";
+import axios from "axios"
+import { RegisterPost } from "@/types/auth";
+import { toast } from "sonner";
 
-const MOCK_USER: User = {
-  id: "u_1",
-  name: "Alex Rivera",
-  email: "alex@meetly.app",
-  role: "host",
-  title: "Product Lead",
-  bio: "Building beautiful software for distributed teams.",
-  avatar: "https://api.dicebear.com/9.x/glass/svg?seed=alex&backgroundType=gradientLinear",
-  createdAt: new Date(Date.now() - 90 * 864e5).toISOString(),
-};
+
+
+
+const API_END_POINT = `${env.BASE_URL}/api/v1/auth`
+axios.defaults.withCredentials = true
 
 export const authService = {
   async login(email: string, _password: string) {
-    await delay();
-    if (!email.includes("@")) throw new Error("Invalid credentials");
-    return { user: { ...MOCK_USER, email }, token: uid() };
+    try {
+
+      const response = await axios.post(`${API_END_POINT}/login`, { email, password: _password },
+        {
+          headers: {
+            "Content-Type": 'application/json',
+          }
+        }
+      )
+      console.log(response);
+
+      if (response.data.success) {
+        console.log(response.data.message);
+        toast.success(response.data.message);
+
+      }
+
+      return response
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
   },
-  async register(name: string, email: string, _password: string) {
-    await delay();
-    return { user: { ...MOCK_USER, id: uid(), name, email }, token: uid() };
+
+  async register(data: RegisterPost) {
+    console.log(data);
+    try {
+
+      const response = await axios.post(`${API_END_POINT}/register`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+      console.log(response);
+
+      if (response.data.success) {
+        // console.log(response.data.message);
+        toast.success(response.data.message);
+
+      }
+
+    } catch (error) {
+      console.log(error.response.data);
+      toast.error(error.response.data.message);
+    }
+
+
   },
   async forgotPassword(email: string) {
     await delay();
@@ -36,7 +77,22 @@ export const authService = {
     return { ok: true };
   },
   async logout() {
-    await delay(200);
-    return { ok: true };
+
+    try {
+
+      const response = await axios.get(`${API_END_POINT}/logout`)
+      console.log(response);
+
+      if (response.data.success) {
+        // console.log(response.data.message);
+        toast.success(response.data.message);
+
+      }
+
+    } catch (error) {
+      console.log(error.response.data);
+      toast.error(error.response.data.message);
+    }
+
   },
 };
