@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { env } from "../utils/env.js"
+import { env } from "../config/env.js"
 import { CustomError } from "../utils/customeError.js"
 
 
@@ -12,7 +12,7 @@ export const createToken = (userId, email = false) => {
         },
         email ? env.MAIL_SECRET : env.JWT_SECRET,
         {
-            expiresIn:email ? "15m" : "1d",// * Expires in 15 minutes
+            expiresIn: email ? "15m" : "1d",// * Expires in 15 minutes
         }
     )
 

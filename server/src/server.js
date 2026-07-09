@@ -1,5 +1,6 @@
 import express from "express";
-import { router as AuthRouter } from "./routes/auth/auth.js";
+import { router as AuthRouter } from "./routes/auth.routes.js";
+import {router as UserRouter} from "./routes/user.routes.js";
 import cors from "cors"
 import dotenv from "dotenv"
 import { connectDB } from "./database/db.js";
@@ -7,11 +8,9 @@ import { connectDB } from "./database/db.js";
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
 
-
 dotenv.config();
 
-// console.log(process.env.MONGODB_URL);
-// console.log(process.env.CLIENT_URL);
+
 
 
 
@@ -31,6 +30,7 @@ app.use(cookieParser())
 
 
 app.use("/api/v1/auth", AuthRouter);
+app.use("/api/v1/user", UserRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World');

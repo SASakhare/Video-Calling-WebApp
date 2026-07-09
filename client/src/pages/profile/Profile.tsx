@@ -67,11 +67,10 @@ export default function Profile() {
     if (!file) return;
     setUploadingAvatar(true);
     try {
+
       const res = await profileService.uploadAvatar(file);
-      if (user) {
-        setUser({ ...user, avatar: res.url });
-        toast.success("Avatar updated");
-      }
+      setUser(res.data.user);
+
     } catch {
       toast.error("Failed to upload avatar");
     } finally {
@@ -84,13 +83,12 @@ export default function Profile() {
     if (!file) return;
     setUploadingCover(true);
     try {
+
       const res = await profileService.uploadCover(file);
-      if (user) {
-        setUser({ ...user, cover: res.url });
-        toast.success("Cover photo updated");
-      }
+      setUser(res.data.user);
+
     } catch {
-      toast.error("Failed to upload cover photo");
+      toast.error("Failed to upload cover ");
     } finally {
       setUploadingCover(false);
     }

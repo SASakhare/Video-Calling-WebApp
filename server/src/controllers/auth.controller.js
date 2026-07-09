@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid"
 import { nanoid } from "nanoid"
 import { hashPassword, verifyPassword } from "../utils/password.js"
-import { createUser, getUserByEmail, getUserByUserId, updateUser } from "../services/user.database.js"
-import { createToken } from "../services/jwt.js"
+import { createUser, getUserByEmail, getUserByUserId, updateUser } from "../services/user.database.service.js"
+import { createToken } from "../services/jwt.service.js"
 import { CustomError } from "../utils/customeError.js"
 
 
@@ -134,54 +134,6 @@ export const logout = async (req, res) => {
     }
 }
 
-
-export const updateMe = async (req, res) => {
-
-
-    try {
-
-        // console.log(req.body);
-        // console.log(req.userId);
-
-        const data = {
-            username: req.body.name,
-            jobTitle: req.body.title,
-            bio: req.body.bio
-        }
-        const updatedUser = await updateUser(req.userId, data)
-        console.log("Updated data");
-        
-        console.log(updatedUser);
-        
-
-        res.status(200).json({
-            success: true,
-            message: "update user successful",
-            user: {
-                username: updatedUser.username,
-                userId: updatedUser.userId,
-                firstName: updatedUser.firstName,
-                lastName: updatedUser.lastName,
-                email: updatedUser.email,
-                company: updatedUser.company,
-                jobTitle: updatedUser.jobTitle,
-                avatar: updatedUser.avatarUrl,
-                cover: updatedUser.coverImageUrl,
-                bio: updatedUser.bio,
-                createdAt: updatedUser.createdAt,
-            }
-        })
-
-
-    } catch (error) {
-        console.log(error.message);
-
-        res.status(403).json({
-            success: false,
-            message: error.message,
-        })
-    }
-}
 
 
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { env } from "../utils/env.js";
+import { env } from "../config/env.js";
 
 
 
@@ -12,7 +12,7 @@ export const connectDB = async () => {
             `${env.MONGODB_URL}/${env.MONGODB_DATABASE}`
         )
         console.log(env.MONGODB_DATABASE);
-        
+
         console.log("Connected DB:", mongoose.connection.name);
         //* ping to database
         await mongoose.connection.db.admin().ping();

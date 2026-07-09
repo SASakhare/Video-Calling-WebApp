@@ -1,6 +1,6 @@
 import express from "express"
-import { login, logout, register ,updateMe} from "../../controllers/auth.js"
-import { get_user } from "../../middlewares/auth.middlewares.js"
+import { login, logout, register } from "../controllers/auth.controller.js"
+import { get_user } from "../middlewares/auth.middleware.js"
 
 export const router = express.Router()
 
@@ -21,12 +21,6 @@ router.post('/register', register)
 // * logout
 
 router.get('/logout',logout);
-
-
-// * update-user
-
-
-router.post('/update-user',get_user,updateMe)
 
 
 

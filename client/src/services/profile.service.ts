@@ -4,7 +4,7 @@ import env from "@/utils/environment";
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_END_POINT = `${env.BASE_URL}/api/v1/auth`
+const API_END_POINT = `${env.BASE_URL}/api/v1/user`
 axios.defaults.withCredentials = true
 
 
@@ -37,12 +37,50 @@ export const profileService = {
 
   },
   async uploadAvatar(_file: File) {
-    await delay(900);
-    return { url: `https://api.dicebear.com/9.x/glass/svg?seed=${Math.random()}` };
+
+    try {
+      console.log(_file);
+      const form = new FormData();
+
+      form.append("avatar", _file);
+
+      const response = await axios.patch(`${API_END_POINT}/profile/avatar`, form)
+
+
+      if (response.data.success) {
+        console.log(response.data);
+        toast.success(response.data.message);
+      }
+
+      return response;
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+
   },
   async uploadCover(_file: File) {
-    await delay(900);
-    return { url: "https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1600" };
+    try {
+      console.log(_file);
+      const form = new FormData();
+
+      form.append("cover", _file);
+
+      const response = await axios.patch(`${API_END_POINT}/profile/cover`, form)
+
+
+      if (response.data.success) {
+        console.log(response.data);
+        toast.success(response.data.message);
+      }
+
+      return response;
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
   },
   async stats() {
     await delay(300);

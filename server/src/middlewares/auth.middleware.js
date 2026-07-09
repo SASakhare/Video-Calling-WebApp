@@ -1,17 +1,17 @@
-import { verifyToken } from "../services/jwt.js";
-import { getUserByUserId } from "../services/user.database.js";
+import { verifyToken } from "../services/jwt.service.js";
+import { getUserByUserId } from "../services/user.database.service.js";
 
 
 export const get_user = async (req, res, next) => {
 
     try {
 
-        const userId=verifyToken(req.cookies.token);
-        
+        const userId = verifyToken(req.cookies.token);
+
         await getUserByUserId(userId);
 
-        req.userId=userId;
-        
+        req.userId = userId;
+
         next();
     } catch (error) {
         console.log(error.message);
