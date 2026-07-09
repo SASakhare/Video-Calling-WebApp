@@ -1,6 +1,7 @@
 export type ID = string;
 
 export interface User {
+  username: string;
   userId: ID;
   firstName: string;
   lastName:string;

@@ -1,10 +1,40 @@
 import type { User } from "@/types";
 import { delay } from "./_mock";
+import env from "@/utils/environment";
+import axios from "axios";
+import { toast } from "sonner";
+
+const API_END_POINT = `${env.BASE_URL}/api/v1/auth`
+axios.defaults.withCredentials = true
+
+
 
 export const profileService = {
   async update(patch: Partial<User>) {
-    await delay();
-    return { ok: true, patch };
+
+    console.log(patch);
+    try {
+      const response = await axios.post(`${API_END_POINT}/update-user`, patch,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }
+      )
+
+      console.log(response);
+
+      if (response.data.success) {
+        console.log(response.data.message);
+        toast.success(response.data.message);
+
+      }
+      return;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+
   },
   async uploadAvatar(_file: File) {
     await delay(900);

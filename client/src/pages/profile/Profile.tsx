@@ -38,10 +38,12 @@ export default function Profile() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
+  const [loading,setLoading]=useState<boolean>(false);
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Values>({
     resolver: zodResolver(schema),
     values: {
-      name: user?.name || "",
+      name: user?.username || "",
       title: user?.title || "",
       bio: user?.bio || "",
     },
@@ -57,17 +59,7 @@ export default function Profile() {
     queryFn: profileService.activity,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: profileService.update,
-    onSuccess: (data) => {
-      if (user) {
-        setUser({ ...user, ...data.patch });
-        toast.success("Profile updated");
-        setEditMode(false);
-      }
-    },
-    onError: () => toast.error("Failed to update profile"),
-  });
+
 
   const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,10 +96,14 @@ export default function Profile() {
   };
 
   const onSubmit = (v: Values) => {
-    updateMutation.mutate(v);
+
+    setLoading(true);
+    profileService.update(v);
+    setLoading(false);
+    
   };
 
-  const initials = (user?.name || "U").split(" ").map((n) => n[0]).slice(0, 2).join("");
+  const initials = (user?.username || "U").split(" ").map((n) => n[0]).slice(0, 2).join("");
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 select-none">
@@ -178,7 +174,7 @@ export default function Profile() {
           <div className="flex-1 pb-2">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-foreground/95">{user?.name}</h1>
+                <h1 className="text-2xl font-bold text-foreground/95">{user?.username}</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">{user?.title || "Product user"}</p>
               </div>
               <Button
@@ -221,10 +217,10 @@ export default function Profile() {
                 </div>
                 <Button
                   type="submit"
-                  disabled={updateMutation.isPending}
+                  disabled={loading}
                   className="w-full h-10 rounded-xl bg-gradient-brand text-primary-foreground btn-glow"
                 >
-                  {updateMutation.isPending ? (
+                  {loading? (
                     <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                   ) : (
                     <Save className="mr-1.5 h-4 w-4" />
@@ -241,13 +237,12 @@ export default function Profile() {
               </p>
               <Separator className="bg-border/60" />
               <div className="text-xs text-muted-foreground space-y-2">
-                <p>Member since: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString([], { dateStyle: 'medium' }) : "No Date"}</p>
-                <p>Role: <span className="capitalize font-semibold text-foreground/80">{user?.role}</span></p>
+                <p>Job Title: <span className="capitalize font-semibold text-foreground/80">{user?.jobTitle}</span></p>
               </div>
             </GlassCard>
           )}
 
-          {/* Stats counters widgets */}
+          {/* // *Stats counters widgets */}
           <GlassCard className="p-4 space-y-4">
             <h2 className="text-sm font-semibold">Meeting Analytics</h2>
             {stats.isLoading ? (
