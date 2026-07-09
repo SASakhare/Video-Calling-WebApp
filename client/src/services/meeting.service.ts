@@ -1,5 +1,12 @@
 import type { Meeting, Participant, ChatMessage } from "@/types";
 import { delay, uid, meetingCode } from "./_mock";
+import env from "@/utils/environment";
+import axios from "axios";
+import { toast } from "sonner";
+
+const API_END_POINT = `${env.BASE_URL}/api/v1/meetings`
+axios.defaults.withCredentials = true
+
 
 const now = Date.now();
 const iso = (offsetMs: number) => new Date(now + offsetMs).toISOString();
@@ -47,21 +54,54 @@ const seedMessages: ChatMessage[] = [
   { id: "c_4", meetingId: "m_1", senderId: "p_5", senderName: "Mika Chen", content: "Audio dropped for a moment — back now.", createdAt: iso(-9 * 60e3) },
 ];
 
+
+
 export const meetingService = {
+
   async list() { await delay(); return seedMeetings; },
+
   async recent() { await delay(); return seedMeetings.filter((m) => m.status === "ended"); },
+
   async upcoming() { await delay(); return seedMeetings.filter((m) => m.status === "scheduled"); },
+
   async get(id: string) {
     await delay(300);
     const m = seedMeetings.find((x) => x.id === id);
     if (!m) throw new Error("Meeting not found");
     return m;
   },
+
   async create(input: Partial<Meeting>) {
     // * we have create meeting here and then send the url
-    await delay();
-    const id = `m_${uid()}`;
-    return { id, code: meetingCode(), ...input } as Meeting & { code: string };
+
+    try {
+      console.log(input);
+
+      // const data={...input,}
+
+      const response = await axios.post(`${API_END_POINT}/`, input, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response);
+
+      if(response.data.success)
+      {
+        toast.success(response.data.message);
+      }
+
+      return response;
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+
+
+
   },
   async validateCode(code: string) {
     await delay(500);

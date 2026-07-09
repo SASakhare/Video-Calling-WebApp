@@ -20,6 +20,8 @@ export default function MeetingCreated() {
   const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
 
+  console.log(location.state);
+  
   // Try state from navigation first, fall back to fetch
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const passedMeeting = (location.state as any)?.meeting;

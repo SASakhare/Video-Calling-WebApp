@@ -22,10 +22,14 @@ import { meetingService } from "@/services/meeting.service";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+
 const schema = z.object({
   title: z.string().trim().min(1, "Meeting title is required").max(120),
   description: z.string().max(500).optional(),
-  date: z.string().optional(),
+  date: z.date().optional(),
   time: z.string().optional(),
   passcodeEnabled: z.boolean(),
   passcode: z.string().optional(),
@@ -42,12 +46,15 @@ export default function CreateMeeting() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [createdMeetingId, setCreatedMeetingId] = useState<string | null>(null);
 
+  const [dateOpen, setDateOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
+
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
       title: "",
       description: "",
-      date: "",
+      date: undefined,
       time: "",
       passcodeEnabled: false,
       passcode: "",
@@ -56,57 +63,72 @@ export default function CreateMeeting() {
     },
   });
 
+  const selectedDate = form.watch("date");
+  const selectedTime = form.watch("time");
 
-  // * we have to update this function  for making new video call
-  const handleInstant = async () => {
+  const timeSlots = Array.from({ length: 48 }, (_, i) => {
+    const h = Math.floor(i / 2);
+    const m = i % 2 === 0 ? "00" : "30";
+    return `${String(h).padStart(2, "0")}:${m}`;
+  });
+
+  const handleInstant = async (v: Values) => {
     setLoading(true);
     try {
-      const result = await meetingService.create({
-        title: `${user?.name?.split(" ")[0] ?? "Quick"}'s meeting`,
-        hostId: user?.id ?? "u_1",
-        hostName: user?.name ?? "You",
-        status: "scheduled",
-        participantsCount: 1,
+      const data = {
+        title: v.title,
+        description: v.description,
+        passcode: v.passcodeEnabled ? (v.passcode || undefined) : undefined,
+        waitingRoom: v.waitingRoom,
+        recording: v.autoRecord,
+        type: "INSTANT",
+      };
+
+      console.log(data);
+
+      const response = await meetingService.create(data);
+
+      navigate(`/meetings/created/${response.data.meeting.meetingId}`, {
+        state: { meeting: response.data.meeting },
       });
-      toast.success("Meeting created!");
-      //* navigating to meeting created page
-      navigate(`/meetings/created/${result.id}`, {
-        state: { meeting: result },
-      });
-      
     } catch {
-      toast.error("Failed to create meeting");
+      toast.error("Failed to Create Instant Meeting");
     } finally {
       setLoading(false);
     }
   };
 
-  const onSubmit = async (v: Values) => {
+  const handleSchedule = async (v: Values) => {
     setLoading(true);
     try {
-      const scheduledAt = v.date && v.time
-        ? new Date(`${v.date}T${v.time}`).toISOString()
-        : new Date().toISOString();
+      // Combine date + time into a single ISO timestamp
+      let scheduledAt: string | undefined;
+      if (v.date && v.time) {
+        const [hours, minutes] = v.time.split(":").map(Number);
+        const combined = new Date(v.date);
+        combined.setHours(hours, minutes, 0, 0);
+        scheduledAt = combined.toISOString();
+      }
 
-      const result = await meetingService.create({
+      const data = {
         title: v.title,
         description: v.description,
-        hostId: user?.id ?? "u_1",
-        hostName: user?.name ?? "You",
-        status: "scheduled",
-        scheduledAt,
-        participantsCount: 1,
         passcode: v.passcodeEnabled ? (v.passcode || undefined) : undefined,
         waitingRoom: v.waitingRoom,
         recording: v.autoRecord,
-      });
-      setCreatedMeetingId(result.id);
-      toast.success("Meeting scheduled!");
-      navigate(`/meetings/created/${result.id}`, {
-        state: { meeting: result },
-      });
+        scheduledAt,
+        type: "SCHEDULED",
+      };
+
+      console.log(data);
+
+      const response = await meetingService.create(data);
+
+      // navigate(`/meetings/created/${response.data.meeting.meetingId}`, {
+      //   state: { meeting: response.data.meeting },
+      // });
     } catch {
-      toast.error("Failed to schedule meeting");
+      toast.error("Failed to Schedule Meeting");
     } finally {
       setLoading(false);
     }
@@ -166,36 +188,151 @@ export default function CreateMeeting() {
       </div>
 
       {/* //* Instant mode */}
-      {mode === "instant" && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <GlassCard className="text-center">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-brand">
-              <Radio className="h-7 w-7" />
-            </div>
-            <h2 className="text-2xl font-bold">Start an instant meeting</h2>
-            <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-              Jump in immediately. Share the link with anyone you want to join.
-            </p>
-            <Button
-              onClick={handleInstant}
-              disabled={loading}
-              size="lg"
-              className="mt-6 h-12 rounded-full bg-gradient-brand px-8 text-primary-foreground btn-glow"
-            >
-              {loading ? (
-                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-              ) : (
-                <Video className="mr-1.5 h-4 w-4" />
-              )}
-              Start now
-              <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </GlassCard>
-        </motion.div>
-      )}
+      <form onSubmit={form.handleSubmit(handleInstant)} className="space-y-6">
+        {mode === "instant" && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <GlassCard>
+              {/* Title */}
+              <div className="space-y-1.5">
+                <Label htmlFor="title">Meeting title</Label>
+                <Input
+                  id="title"
+                  placeholder="e.g. Q3 Product Review"
+                  className="h-11 rounded-xl"
+                  {...form.register("title")}
+                />
+                {form.formState.errors.title && (
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.title.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <Label htmlFor="desc">
+                  Description{" "}
+                  <span className="text-muted-foreground">(optional)</span>
+                </Label>
+                <Textarea
+                  id="desc"
+                  placeholder="Agenda, notes, or context for attendees..."
+                  className="min-h-[80px] rounded-xl resize-none"
+                  {...form.register("description")}
+                />
+              </div>
+
+              <Separator className="bg-border/60" />
+
+              {/* Options */}
+              <div className="space-y-4">
+                <p className="text-sm font-semibold flex items-center gap-1.5">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  Meeting options
+                </p>
+
+                {/* Passcode */}
+                <div className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Require passcode</p>
+                      <p className="text-xs text-muted-foreground">
+                        Participants must enter a code to join
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={passcodeEnabled}
+                    onCheckedChange={(v) =>
+                      form.setValue("passcodeEnabled", v)
+                    }
+                  />
+                </div>
+                {passcodeEnabled && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="pl-11"
+                  >
+                    <Input
+                      placeholder="Auto-generated if empty"
+                      className="h-10 max-w-xs rounded-xl font-mono"
+                      {...form.register("passcode")}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Waiting room */}
+                <div className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Waiting room</p>
+                      <p className="text-xs text-muted-foreground">
+                        Admit participants manually
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={form.watch("waitingRoom")}
+                    onCheckedChange={(v) =>
+                      form.setValue("waitingRoom", v)
+                    }
+                  />
+                </div>
+
+                {/* Auto record */}
+                <div className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Auto-record</p>
+                      <p className="text-xs text-muted-foreground">
+                        Start recording when the meeting begins
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={form.watch("autoRecord")}
+                    onCheckedChange={(v) =>
+                      form.setValue("autoRecord", v)
+                    }
+                  />
+                </div>
+              </div>
+
+              <Separator className="bg-border/60" />
+            </GlassCard>
+            <GlassCard className="text-center mt-5">
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-brand">
+                <Radio className="h-7 w-7" />
+              </div>
+              <h2 className="text-2xl font-bold">Start an instant meeting</h2>
+              <p className="mx-auto mt-2 max-w-md text-muted-foreground">
+                Jump in immediately. Share the link with anyone you want to join.
+              </p>
+              <Button
+                disabled={loading}
+                type="submit"
+                size="lg"
+                className="mt-6 h-12 rounded-full bg-gradient-brand px-8 text-primary-foreground btn-glow"
+              >
+                {loading ? (
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                ) : (
+                  <Video className="mr-1.5 h-4 w-4" />
+                )}
+                Start now
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            </GlassCard>
+          </motion.div>
+        )}
+      </form>
 
       {/* //* Scheduled mode */}
       {mode === "scheduled" && (
@@ -204,7 +341,7 @@ export default function CreateMeeting() {
           animate={{ opacity: 1, y: 0 }}
         >
           <GlassCard>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSchedule)} className="space-y-6">
               {/* Title */}
               <div className="space-y-1.5">
                 <Label htmlFor="title">Meeting title</Label>
@@ -237,30 +374,96 @@ export default function CreateMeeting() {
 
               {/* Date & Time */}
               <div className="grid gap-4 sm:grid-cols-2">
+                {/* Date Picker */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="date" className="flex items-center gap-1.5">
+                  <Label className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                     Date
                   </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    className="h-11 rounded-xl"
-                    min={new Date().toISOString().split("T")[0]}
-                    {...form.register("date")}
-                  />
+                  <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-11 w-full justify-start rounded-xl text-left font-normal",
+                          !selectedDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(date) => {
+                          if (date) {
+                            form.setValue("date", date, { shouldValidate: true });
+                            setDateOpen(false);
+                          }
+                        }}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {form.formState.errors.date && (
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.date.message}
+                    </p>
+                  )}
                 </div>
+
+                {/* Time Picker */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="time" className="flex items-center gap-1.5">
+                  <Label className="flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                     Time
                   </Label>
-                  <Input
-                    id="time"
-                    type="time"
-                    className="h-11 rounded-xl"
-                    {...form.register("time")}
-                  />
+                  <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-11 w-full justify-start rounded-xl text-left font-normal",
+                          !selectedTime && "text-muted-foreground"
+                        )}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        {selectedTime || "Pick a time"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-40 p-0" align="start">
+                      <div className="max-h-64 overflow-y-auto py-1">
+                        {timeSlots.map((slot) => (
+                          <button
+                            key={slot}
+                            type="button"
+                            className={cn(
+                              "w-full px-3 py-2 text-left text-sm hover:bg-muted/60 transition-colors",
+                              selectedTime === slot && "bg-muted font-semibold"
+                            )}
+                            onClick={() => {
+                              form.setValue("time", slot, { shouldValidate: true });
+                              setTimeOpen(false);
+                            }}
+                          >
+                            {slot}
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  {form.formState.errors.time && (
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.time.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -368,7 +571,6 @@ export default function CreateMeeting() {
                   size="lg"
                   className="h-12 rounded-full px-6"
                   onClick={() => {
-                    // Use a placeholder ID for pre-creation invites
                     setCreatedMeetingId("m_preview");
                     setInviteOpen(true);
                   }}

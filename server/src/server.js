@@ -1,6 +1,8 @@
 import express from "express";
 import { router as AuthRouter } from "./routes/auth.routes.js";
-import {router as UserRouter} from "./routes/user.routes.js";
+import { router as UserRouter } from "./routes/user.routes.js";
+import { router as MeetingRouter } from "./routes/meetings.routes.js"
+
 import cors from "cors"
 import dotenv from "dotenv"
 import { connectDB } from "./database/db.js";
@@ -31,6 +33,7 @@ app.use(cookieParser())
 
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/user", UserRouter);
+app.use("/api/v1/meetings", MeetingRouter)
 
 app.get('/', (req, res) => {
     res.send('Hello World');

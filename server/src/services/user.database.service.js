@@ -1,4 +1,4 @@
-import { User } from "../models/user.js";
+import { User } from "../models/user.models.js";
 import { CustomError } from "../utils/customeError.js"
 
 export const createUser = async (data) => {
