@@ -29,7 +29,7 @@ export const profileService = {
         toast.success(response.data.message);
 
       }
-      return;
+      return response;
     } catch (error) {
       console.log(error.response.data.message);
       toast.error(error.response.data.message);

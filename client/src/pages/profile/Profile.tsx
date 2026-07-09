@@ -38,7 +38,8 @@ export default function Profile() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const [loading,setLoading]=useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -95,19 +96,22 @@ export default function Profile() {
     }
   };
 
-  const onSubmit = (v: Values) => {
+  const onSubmit = async (v: Values) => {
 
     setLoading(true);
-    profileService.update(v);
+    const response = await profileService.update(v);
+
+    setUser(response.data.user);
+
     setLoading(false);
-    
+
   };
 
   const initials = (user?.username || "U").split(" ").map((n) => n[0]).slice(0, 2).join("");
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 select-none">
-      
+
       {/* Cover and header card */}
       <GlassCard className="p-0 overflow-hidden relative border border-border/60">
         {/* Cover image wrapper */}
@@ -220,7 +224,7 @@ export default function Profile() {
                   disabled={loading}
                   className="w-full h-10 rounded-xl bg-gradient-brand text-primary-foreground btn-glow"
                 >
-                  {loading? (
+                  {loading ? (
                     <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                   ) : (
                     <Save className="mr-1.5 h-4 w-4" />

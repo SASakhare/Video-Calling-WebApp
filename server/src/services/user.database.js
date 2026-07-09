@@ -40,7 +40,12 @@ export const updateUser = async (userId, data) => {
 
         // * create user and return user without password
 
-        const updatedUser = await User.findByIdAndUpdate(userId, data, {
+        // const updatedUser = await User.findByIdAndUpdate(userId, data, {
+        //     new: true,
+        //     runValidators: true,
+        // })
+
+        const updatedUser = await User.findOneAndUpdate({userId}, data, {
             new: true,
             runValidators: true,
         })
@@ -49,7 +54,7 @@ export const updateUser = async (userId, data) => {
             throw new CustomError("User Not Exist with this ID", 404);
         }
 
-        return updateUser;
+        return updatedUser;
 
     } catch (error) {
 
