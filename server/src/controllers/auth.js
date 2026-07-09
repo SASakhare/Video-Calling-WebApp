@@ -35,6 +35,7 @@ export const login = async (req, res) => {
             success: true,
             message: "login successful",
             user: {
+                username: user.username,
                 userId: user.userId,
                 firstName: user.firstName,
                 lastName: user.lastName,
@@ -116,10 +117,36 @@ export const logout = async (req, res) => {
         console.log(req.cookies.token);
 
         res.clearCookie("token")
-        
+
         res.status(200).json({
             success: true,
             message: "logout successful"
+        })
+
+
+    } catch (error) {
+        console.log(error.message);
+
+        res.status(403).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+
+export const updateMe = async (req, res) => {
+
+
+    try {
+
+        // console.log(req.body);
+        console.log(req.userId);
+
+
+        res.status(200).json({
+            success: true,
+            message: "update successful successful"
         })
 
 
