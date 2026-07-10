@@ -1,8 +1,10 @@
 import type { Meeting, Participant, ChatMessage } from "@/types";
-import { delay, uid, meetingCode } from "./_mock";
+import { delay } from "./_mock";
 import env from "@/utils/environment";
 import axios from "axios";
 import { toast } from "sonner";
+import { useMeetingStore } from "@/store/meeting.store";
+
 
 const API_END_POINT = `${env.BASE_URL}/api/v1/meetings`
 axios.defaults.withCredentials = true
@@ -58,17 +60,211 @@ const seedMessages: ChatMessage[] = [
 
 export const meetingService = {
 
-  async list() { await delay(); return seedMeetings; },
 
-  async recent() { await delay(); return seedMeetings.filter((m) => m.status === "ended"); },
+  async list() {
+    try {
+      const state = useMeetingStore.getState();
 
-  async upcoming() { await delay(); return seedMeetings.filter((m) => m.status === "scheduled"); },
+      if (state.meetings.length != 0) {
+        return state.meetings;
+      }
+
+      const response = await axios.get(`${API_END_POINT}/`);
+      console.log(response.data);
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        state.setMeetings(response.data.meetings)
+
+      }
+
+      return response.data.meetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+  },
+
+  async recent() {
+
+    const state = useMeetingStore.getState();
+
+    try {
+      const meetings = state.meetings;
+
+      const recentMeetings = meetings.filter((m) => m.status == 'ENDED')
+      return recentMeetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+
+  async upcoming() {
+    const state = useMeetingStore.getState();
+
+    try {
+      const meetings = state.meetings;
+      const now = new Date();
+      const upcomingMeetings = meetings.filter(
+        (meeting) =>
+          meeting.status === "CREATED" &&
+          meeting.scheduledStartTime &&
+          new Date(meeting.scheduledStartTime) > now
+      );
+      return upcomingMeetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+  async waiting() {
+    const state = useMeetingStore.getState();
+
+    try {
+      const meetings = state.meetings;
+
+      const filteredMeetings = meetings.filter((m) => m.status == 'WAITING')
+      return filteredMeetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+  async live() {
+    const state = useMeetingStore.getState();
+
+    try {
+      const meetings = state.meetings;
+
+      const filteredMeetings = meetings.filter((m) => m.status == 'LIVE')
+      return filteredMeetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+  async cancelled() {
+    const state = useMeetingStore.getState();
+
+    try {
+      const meetings = state.meetings;
+
+      const filteredMeetings = meetings.filter((m) => m.status == 'CANCELLED')
+      return filteredMeetings;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+
+  async cancel(meetingId: string) {
+    const state = useMeetingStore.getState();
+
+    try {
+
+      const response = await axios.delete(`${API_END_POINT}/${meetingId}/cancel`);
+      if (response.data.success) {
+        console.log(response);
+        state.updateMeeting(response.data.meeting);
+        toast.success(response.data.message);
+      }
+      return;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+  },
+  async update(payload: { meetingId: string } & Partial<Meeting>) {
+    const state = useMeetingStore.getState();
+
+    try {
+      const { meetingId, ...data } = payload;
+      console.log(data);
+      
+      const response = await axios.patch(
+        `${API_END_POINT}/${meetingId}`,
+        data
+      );
+
+      if (response.data.success) {
+        console.log(response);
+        state.updateMeeting(response.data.meeting);
+        toast.success(response.data.message);
+      }
+
+      return response.data.meeting as Meeting;
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+
+    }
+
+
+
+  },
+  getMeetingDuration(
+    actualStartTime?: string,
+    actualEndTime?: string
+  ): string {
+    if (!actualStartTime || !actualEndTime) {
+      return "--";
+    }
+
+    const start = new Date(actualStartTime);
+    const end = new Date(actualEndTime);
+
+    const diff = end.getTime() - start.getTime();
+
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) {
+      return `${minutes}m`;
+    }
+
+    return `${hours}h ${minutes}m`;
+  },
 
   async get(id: string) {
-    await delay(300);
-    const m = seedMeetings.find((x) => x.id === id);
-    if (!m) throw new Error("Meeting not found");
-    return m;
+    const state = useMeetingStore.getState();
+    console.log('Inside get function ');
+    console.log("id :", id);
+
+
+    const meetings = state.meetings;
+
+    const meeting = meetings.filter((m) => m.meetingId == id);
+
+    if (meeting) {
+      console.log(meeting[0]);
+      return meeting[0];
+
+    }
+    try {
+      const response = await axios.get(`${API_END_POINT}/${id}`);
+
+      if (response.data.success) {
+        console.log(response);
+      }
+
+      return response.data.meeting;
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message)
+
+    }
+
+    return;
   },
 
   async create(input: Partial<Meeting>) {
@@ -87,8 +283,7 @@ export const meetingService = {
 
       console.log(response);
 
-      if(response.data.success)
-      {
+      if (response.data.success) {
         toast.success(response.data.message);
       }
 
@@ -113,8 +308,8 @@ export const meetingService = {
 
   /** Generate an .ics calendar file blob */
   generateCalendarEvent(meeting: Meeting & { code?: string }): Blob {
-    const start = meeting.scheduledAt
-      ? new Date(meeting.scheduledAt)
+    const start = meeting.scheduledStartTime
+      ? new Date(meeting.scheduledStartTime)
       : new Date();
     const end = new Date(start.getTime() + 60 * 60e3); // 1 hour default
     const fmt = (d: Date) =>
@@ -127,8 +322,8 @@ export const meetingService = {
       `DTSTART:${fmt(start)}`,
       `DTEND:${fmt(end)}`,
       `SUMMARY:${meeting.title}`,
-      `DESCRIPTION:Join at meetly.app/join/${meeting.code || meeting.id}`,
-      `URL:https://meetly.app/meetings/lobby/${meeting.id}`,
+      `DESCRIPTION:Join at meetly.app/join/${meeting.code || meeting.meetingId}`,
+      `URL:https://meetly.app/meetings/lobby/${meeting.meetingId}`,
       "END:VEVENT",
       "END:VCALENDAR",
     ].join("\r\n");
@@ -137,8 +332,8 @@ export const meetingService = {
 
   /** Generate a Google Calendar event URL */
   generateGoogleCalendarUrl(meeting: Meeting & { code?: string }): string {
-    const start = meeting.scheduledAt
-      ? new Date(meeting.scheduledAt)
+    const start = meeting.scheduledStartTime
+      ? new Date(meeting.scheduledStartTime)
       : new Date();
     const end = new Date(start.getTime() + 60 * 60e3);
     const fmt = (d: Date) =>
@@ -147,8 +342,8 @@ export const meetingService = {
       action: "TEMPLATE",
       text: meeting.title,
       dates: `${fmt(start)}/${fmt(end)}`,
-      details: `Join at meetly.app/join/${meeting.code || meeting.id}`,
-      location: `https://meetly.app/meetings/lobby/${meeting.id}`,
+      details: `Join at meetly.app/join/${meeting.code || meeting.meetingId}`,
+      location: `https://meetly.app/meetings/lobby/${meeting.meetingId}`,
     });
     return `https://calendar.google.com/calendar/r/eventedit?${params}`;
   },
@@ -156,12 +351,12 @@ export const meetingService = {
   /** Get post-meeting summary mock details */
   async summary(id: string) {
     await delay(500);
-    const meeting = seedMeetings.find((m) => m.id === id) || seedMeetings[0];
+    const meeting = seedMeetings.find((m) => m.meetingId === id) || seedMeetings[0];
     return {
       meetingId: id,
       title: meeting.title,
       hostName: meeting.hostName,
-      date: meeting.scheduledAt || new Date().toISOString(),
+      date: meeting.scheduledStartTime || new Date().toISOString(),
       durationMin: 42,
       attendees: seedParticipants,
       recordingUrl: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/mock-meeting-rec.mp4",

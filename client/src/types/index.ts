@@ -4,10 +4,10 @@ export interface User {
   username: string;
   userId: ID;
   firstName: string;
-  lastName:string;
+  lastName: string;
   email: string;
-  company:string;
-  jobTitle:string
+  company: string;
+  jobTitle: string
   avatar?: string;
   cover?: string;
   title?: string;
@@ -31,20 +31,40 @@ export interface Participant {
 }
 
 export interface Meeting {
-  id: ID;
+  meetingId: ID;
+
   title: string;
   description?: string;
+
   hostId: ID;
-  hostName: string;
-  scheduledAt?: string;
-  startedAt?: string;
-  endedAt?: string;
-  durationMin?: number;
-  status: "scheduled" | "live" | "ended" | "cancelled";
+  hostName?: string;
+
+  meetingLink: string;
+
+  meetingPassword?: string;
+
+  type_: "INSTANT" | "SCHEDULED";
+
+  status:
+  | "CREATED"
+  | "WAITING"
+  | "LIVE"
+  | "ENDED"
+  | "CANCELLED";
+
+  scheduledStartTime?: string;
+
+  actualStartTime?: string;
+
+  actualEndTime?: string;
+
+  participantLimit: number;
+
   participantsCount: number;
-  recording?: boolean;
-  passcode?: string;
-  waitingRoom?: boolean;
+
+  waitingRoomEnabled: boolean;
+
+  recordingEnabled?: boolean;
 }
 
 export interface ChatMessage {

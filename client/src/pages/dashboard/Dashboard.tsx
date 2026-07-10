@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/common/LoadingSkeleton";
 import { meetingService } from "@/services/meeting.service";
 import { useAuthStore } from "@/store/auth.store";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,6 +20,11 @@ export default function Dashboard() {
 
   const first = (user?.firstName || "there").split(" ")[0];
   const personalRoom = `meetly.app/${(user?.firstName || "you").toLowerCase().replace(/\s+/g, "-")}`;
+
+  useEffect(() => {
+    meetingService.list();
+  }, [])
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
@@ -36,7 +42,7 @@ export default function Dashboard() {
             <Button size="lg" variant="secondary" className="rounded-full" onClick={() => navigate("/meetings/new")}>
               <Plus className="mr-1.5 h-4 w-4" /> New meeting
             </Button>
-            
+
             {/* //* button for join meeting */}
             <Button size="lg" variant="outline" className="rounded-full border-white/30 bg-white/10 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground" onClick={() => navigate("/meetings/join")}>
               <Video className="mr-1.5 h-4 w-4" /> Join with code
@@ -104,12 +110,12 @@ export default function Dashboard() {
               [1, 2].map((i) => <Skeleton key={i} className="h-24 w-full" />)
             ) : upcoming.data && upcoming.data.length ? (
               upcoming.data.map((m) => (
-                <GlassCard key={m.id} hover onClick={() => navigate(`/meetings/lobby/${m.id}`)} className="cursor-pointer">
+                <GlassCard key={m.meetingId} hover onClick={() => navigate(`/meetings/lobby/${m.meetingId}`)} className="cursor-pointer">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <h3 className="truncate font-semibold">{m.title}</h3>
                       <p className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                        <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" />{m.scheduledAt && new Date(m.scheduledAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
+                        <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" />{m.scheduledStartTime && new Date(m.scheduledStartTime).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
                         <span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{m.participantsCount}</span>
                       </p>
                     </div>
@@ -135,12 +141,12 @@ export default function Dashboard() {
               [1, 2, 3].map((i) => <Skeleton key={i} className="h-20 w-full" />)
             ) : recent.data && recent.data.length ? (
               recent.data.map((m) => (
-                <GlassCard key={m.id} hover onClick={() => navigate(`/meetings/summary/${m.id}`)} className="cursor-pointer">
+                <GlassCard key={m.meetingId} hover onClick={() => navigate(`/meetings/summary/${m.meetingId}`)} className="cursor-pointer">
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
                       <h3 className="truncate font-semibold">{m.title}</h3>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {m.durationMin}m · {m.participantsCount} participants {m.recording && "· 🎥 recorded"}
+                        {meetingService.getMeetingDuration(m.actualStartTime,m.actualEndTime)} | {m.participantsCount} participants {m.recordingEnabled && "· 🎥 recorded"}
                       </p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />

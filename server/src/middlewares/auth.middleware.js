@@ -7,7 +7,8 @@ export const get_user = async (req, res, next) => {
     try {
 
         const userId = verifyToken(req.cookies.token);
-
+        console.log("userId(get_user) :",userId);
+        
         await getUserByUserId(userId);
 
         req.userId = userId;

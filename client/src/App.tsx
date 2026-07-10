@@ -35,6 +35,7 @@ import Profile from "@/pages/profile/Profile";
 import Settings from "@/pages/settings/Settings";
 import Help from "@/pages/help/Help";
 import ErrorPage from "@/pages/errors/ErrorPage";
+import MeetingUpdate from "./pages/meetings/MeetingUpdate";
 
 export default function App() {
   return (
@@ -70,6 +71,7 @@ export default function App() {
                 <Route path="/meetings/created/:id" element={<MeetingCreated />} />
                 <Route path="/meetings/lobby/:id" element={<MeetingLobby />} />
                 <Route path="/meetings/waiting/:id" element={<WaitingRoom />} />
+                <Route path="/meetings/edit/:meetingId" element={<MeetingUpdate />} />
                 <Route path="/meetings/summary/:id" element={<MeetingSummary />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
