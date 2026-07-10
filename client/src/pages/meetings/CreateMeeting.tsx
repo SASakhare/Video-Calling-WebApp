@@ -102,12 +102,12 @@ export default function CreateMeeting() {
     setLoading(true);
     try {
       // Combine date + time into a single ISO timestamp
-      let scheduledAt: string | undefined;
+      let scheduledStartTime: string | undefined;
       if (v.date && v.time) {
         const [hours, minutes] = v.time.split(":").map(Number);
         const combined = new Date(v.date);
         combined.setHours(hours, minutes, 0, 0);
-        scheduledAt = combined.toISOString();
+        scheduledStartTime = combined.toISOString();
       }
 
       const data = {
@@ -116,7 +116,7 @@ export default function CreateMeeting() {
         passcode: v.passcodeEnabled ? (v.passcode || undefined) : undefined,
         waitingRoom: v.waitingRoom,
         recording: v.autoRecord,
-        scheduledAt,
+        scheduledStartTime,
         type: "SCHEDULED",
       };
 
@@ -124,9 +124,9 @@ export default function CreateMeeting() {
 
       const response = await meetingService.create(data);
 
-      // navigate(`/meetings/created/${response.data.meeting.meetingId}`, {
-      //   state: { meeting: response.data.meeting },
-      // });
+      navigate(`/meetings/created/${response.data.meeting.meetingId}`, {
+        state: { meeting: response.data.meeting },
+      });
     } catch {
       toast.error("Failed to Schedule Meeting");
     } finally {

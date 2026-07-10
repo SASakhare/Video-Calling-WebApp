@@ -34,14 +34,14 @@ export default function MeetingCreated() {
 
   const meeting = passedMeeting || fetched.data;
   const meetingCode = passedMeeting?.code || id;
-  const meetingLink = `meetly.app/join/${meetingCode}`;
+  const meetingLink =passedMeeting.meetingLink;
 
   const inviteText = useMemo(() => {
     if (!meeting) return "";
     const lines = [
       `You're invited to "${meeting.title}" on Meetly.`,
       "",
-      `Join: https://${meetingLink}`,
+      `Join: ${meetingLink}`,
     ];
     if (meeting.passcode) lines.push(`Passcode: ${meeting.passcode}`);
     if (meeting.scheduledAt) {
@@ -56,7 +56,7 @@ export default function MeetingCreated() {
   }, [meeting, meetingLink]);
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${meetingLink}`);
+    navigator.clipboard.writeText(`${meetingLink}`);
     toast.success("Meeting link copied");
   };
 

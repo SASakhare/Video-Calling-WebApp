@@ -4,7 +4,7 @@ import { env } from "../config/env.js"
 
 export const createMeetingLink = (meetingId) => {
 
-    const url = `${env.CLIENT_URL}/meeting/join?meetingId=${meetingId}`
+    const url = `${env.CLIENT_URL}/meetings/join?meetingId=${meetingId}`
     return url;
 }
 
