@@ -5,6 +5,7 @@ import env from "@/utils/environment";
 import axios from "axios"
 import { RegisterPost } from "@/types/auth";
 import { toast } from "sonner";
+import { useMeetingStore } from "@/store/meeting.store";
 
 
 
@@ -77,7 +78,7 @@ export const authService = {
     return { ok: true };
   },
   async logout() {
-
+    const state=useMeetingStore.getState();
     try {
 
       const response = await axios.get(`${API_END_POINT}/logout`)
@@ -85,6 +86,8 @@ export const authService = {
 
       if (response.data.success) {
         // console.log(response.data.message);
+        state.clearCurrentMeeting();
+        state.setMeetings([]);
         toast.success(response.data.message);
 
       }
