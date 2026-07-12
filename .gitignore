@@ -23,5 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 client.md
+Welcome to Markdown.md
 
 .env
+
+real_time.md
+meeting.md

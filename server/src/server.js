@@ -1,4 +1,6 @@
 import express from "express";
+import { createServer } from "http"
+
 import { router as AuthRouter } from "./routes/auth.routes.js";
 import { router as UserRouter } from "./routes/user.routes.js";
 import { router as MeetingRouter } from "./routes/meetings.routes.js"
@@ -9,6 +11,8 @@ import { connectDB } from "./database/db.js";
 // * remove while deploying
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
+import { initializeSocket, getIO } from "./socket/index.js"
+import { registerSocketEvents } from "./socket/register.js";
 
 dotenv.config();
 
@@ -17,6 +21,11 @@ dotenv.config();
 
 
 const app = express();
+const httpServer = createServer(app);
+
+const io = initializeSocket(httpServer);
+registerSocketEvents(io);
+
 const PORT = 8000;
 await connectDB();
 
@@ -40,7 +49,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`server running at : http://localhost:${PORT}`);
 
 })

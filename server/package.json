@@ -21,8 +21,13 @@
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
     "nanoid": "^5.1.16",
+    "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
     "uuid": "^14.0.1"
   },
-  "type": "module"
+  "type": "module",
+  "optionalDependencies": {
+    "bufferutil": "^4.1.0",
+    "utf-8-validate": "^6.0.6"
+  }
 }

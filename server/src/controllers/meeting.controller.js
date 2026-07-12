@@ -83,7 +83,9 @@ export const getMeeting = async (req, res) => {
     try {
 
         const meetingId = req.params.meetingId;
+        const userId=req.userId;
         console.log('meetingId (getMeeting) :', meetingId);
+        console.log('userId (getMeeting) :', userId);
 
         const meeting = await getMeetingDB(userId, meetingId);
 

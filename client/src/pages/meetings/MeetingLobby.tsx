@@ -63,11 +63,15 @@ export default function MeetingLobby() {
 
   const handleJoin = () => {
     stop(); // Release media before navigating
-    if (meeting.data?.waitingRoom) {
-      navigate(`/meetings/waiting/${id}`);
-    } else {
-      navigate(`/meetings/room/${id}`);
-    }
+    // if (meeting.data?.waitingRoom) {
+    //   navigate(`/meetings/waiting/${id}`);
+    // } else {
+    //   navigate(`/meetings/room/${id}`);
+    // }
+
+    // * meeting => waitingRoom 
+      
+    // * meeting => room join 
   };
 
   const handleBack = () => {

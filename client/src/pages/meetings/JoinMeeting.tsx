@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -11,17 +11,20 @@ import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/common/GlassCard";
 import { MeetingCodeInput } from "@/components/meetings/MeetingCodeInput";
 import { meetingService } from "@/services/meeting.service";
-
+import { socketService } from "@/services/socket.service";
 export default function JoinMeeting() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const recent = useQuery({
     queryKey: ["meetings", "recent"],
     queryFn: meetingService.recent,
   });
+
+  // * this is the handleJoin function :
 
   const handleJoin = async () => {
     if (!code || code.replace(/-/g, "").length < 3) {
@@ -31,10 +34,14 @@ export default function JoinMeeting() {
     setLoading(true);
     setError(null);
     try {
-      const result = await meetingService.validateCode(code);
-      toast.success("Meeting found — joining lobby");
-      navigate(`/meetings/lobby/${result.meetingId}`);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const meetingId = searchParams.get('meetingId')
+      const result = await meetingService.validateCode(meetingId);
+
+      // * make the socket connection :
+      socketService.connect("token--token--token--token");
+
+      // navigate(`/meetings/lobby/${result.meetingId}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || "Invalid or expired meeting code");
     } finally {
@@ -125,14 +132,14 @@ export default function JoinMeeting() {
           <div className="space-y-2">
             {recent.data.slice(0, 3).map((m, i) => (
               <motion.div
-                key={m.id}
+                key={m.meetingId}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.12 + i * 0.04 }}
               >
                 <GlassCard
                   hover
-                  onClick={() => navigate(`/meetings/lobby/${m.id}`)}
+                  onClick={() => navigate(`/meetings/lobby/${m.meetingId}`)}
                   className="cursor-pointer"
                 >
                   <div className="flex items-center justify-between gap-4">
@@ -141,7 +148,7 @@ export default function JoinMeeting() {
                       <p className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {m.durationMin}
+                          {/* {m.durationMin} */}
                         </span>
                         <span className="inline-flex items-center gap-1">
                           <Users className="h-3 w-3" />

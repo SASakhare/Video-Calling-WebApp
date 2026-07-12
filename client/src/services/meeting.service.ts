@@ -187,7 +187,7 @@ export const meetingService = {
     try {
       const { meetingId, ...data } = payload;
       console.log(data);
-      
+
       const response = await axios.patch(
         `${API_END_POINT}/${meetingId}`,
         data
@@ -299,9 +299,24 @@ export const meetingService = {
 
   },
   async validateCode(code: string) {
-    await delay(500);
-    if (!code || code.length < 3) throw new Error("Invalid meeting code");
-    return { ok: true, meetingId: "m_1" };
+
+    try {
+      console.log(code);
+
+      const response = await axios.get(`${API_END_POINT}/${code}`);
+
+      if (response.data.success) {
+        console.log(response.data);
+
+        toast.success("Meeting found — joining lobby")
+      }
+      return response.data.meeting;
+    } catch (error) {
+
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+
   },
   async participants(_id: string) { await delay(300); return seedParticipants; },
   async messages(_id: string) { await delay(300); return seedMessages; },
