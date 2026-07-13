@@ -28,7 +28,8 @@ export const createParticipantDB = async (userId, meetingId, data) => {
         const existParticipant = await Participant.findOne({ meetingId, userId })
 
         if (existParticipant) {
-            throw CustomError("User already participated in the meeting", 400)
+            // throw CustomError("User already participated in the meeting", 400)
+            return existParticipant;
         }
 
         const participant = await Participant.create(data);
@@ -110,29 +111,54 @@ export const getParticipantsDB = async (userId, meetingId) => {
 
         // * checking meeting exist :
 
-        const meeting = await Meeting.findOne({ meetingId, hostId: userId })
+        const meeting = await Meeting.findOne({ meetingId })
 
         if (!meeting) {
 
-            throw CustomError("Requested Meeting Not Found", 400)
+            throw new CustomError("Requested Meeting Not Found", 400)
 
         } else if (meeting.status == 'CANCELLED') {
 
-            throw CustomError("Requested Meeting CANCELLED", 400)
+            throw new CustomError("Requested Meeting CANCELLED", 400)
 
         } else if (meeting.status == 'ENDED') {
 
-            throw CustomError("Requested Meeting ENDED", 400)
+            throw new CustomError("Requested Meeting ENDED", 400)
         }
 
 
         const participants = await Participant.find({ meetingId });
 
-        if (!participants) {
-            throw new CustomError("Error while  Participants Fetching", 503);
-        }
+        // if (!participants) {
+        //     throw new CustomError("Error while  Participants Fetching", 503);
+        // }
 
         return participants;
+
+    } catch (error) {
+
+        console.error("ERROR -Participants Fetching Failure:", error.message);
+
+        if (error instanceof CustomError || error.statusCode) {
+            throw error;
+
+        }
+        throw new CustomError("Error while Participants Fetching", 503);
+    }
+
+}
+
+export const getParticipantDB = async (hostId,meetingId) => {
+
+    try {
+
+        const participant = await Participant.findOne({ hostId,meetingId });
+
+        // if (!participants) {
+        //     throw new CustomError("Error while  Participants Fetching", 503);
+        // }
+
+        return participant;
 
     } catch (error) {
 
@@ -176,6 +202,41 @@ export const getCurrentParticipantDB = async (userId, meetingId) => {
         if (!participants) {
             throw new CustomError("Error while  Participant Fetching", 503);
         }
+
+        return participants;
+
+    } catch (error) {
+
+        console.error("ERROR -Participant Fetching Failure:", error.message);
+
+        if (error instanceof CustomError || error.statusCode) {
+            throw error;
+
+        }
+        throw new CustomError("Error while Participant Fetching", 503);
+    }
+
+}
+
+export const updateParticipantDB = async (participantId, data) => {
+
+    try {
+
+
+        // * checking meeting exist :
+
+
+        const participants = await Participant.findOneAndUpdate({ participantId }, data, {
+            new: true,
+            runValidators: true,
+
+        });
+
+        console.log(participants);
+
+        // if (!participants) {
+        //     throw new CustomError("Error while  Participant Fetching", 503);
+        // }
 
         return participants;
 

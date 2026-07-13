@@ -82,6 +82,34 @@ export const getMeetingDB = async (userId, meetingId) => {
     }
 
 }
+export const getMeetingByMeetingIdDB = async (meetingId) => {
+
+
+    try {
+
+        // * create Meeting and return Meeting details
+
+        const meeting = await Meeting.findOne({ meetingId });
+        // console.log(meeting);
+
+        // if(meeting==){
+        //     throw new CustomError("Meeting Not Found",400)
+        // }
+
+        return meeting;
+
+    } catch (error) {
+
+        console.error("ERROR - Meeting Fetching Failure:", error.message);
+
+        if (error instanceof CustomError || error.statusCode) {
+            throw error;
+
+        }
+        throw new CustomError("Error while Meeting Fetching", 503);
+    }
+
+}
 
 
 export const updateMeetingDB = async (userId, meetingId, data) => {
