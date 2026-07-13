@@ -20,13 +20,13 @@ export function MeetingCodeInput({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       // Strip everything except alphanumeric
-      const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+      const raw = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
       // Format as xxxx-xxxx-xxxx
       const parts: string[] = [];
       for (let i = 0; i < raw.length && i < 12; i += 4) {
         parts.push(raw.slice(i, i + 4));
       }
-      onChange(parts.join("-"));
+      onChange(raw);
     },
     [onChange]
   );

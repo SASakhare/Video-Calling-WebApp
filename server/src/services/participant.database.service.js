@@ -1,6 +1,6 @@
 import { Meeting } from "../models/meeting.models.js";
 import { Participant } from "../models/participant.models.js";
-import { CustomError } from "../utils/customeError";
+import { CustomError } from "../utils/customeError.js";
 
 
 export const createParticipantDB = async (userId, meetingId, data) => {

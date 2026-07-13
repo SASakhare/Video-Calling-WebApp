@@ -4,7 +4,8 @@ import env from "@/utils/environment";
 import axios from "axios";
 import { toast } from "sonner";
 import { useMeetingStore } from "@/store/meeting.store";
-
+import { socketService } from "./socket.service";
+import { CLIENT_EVENTS } from "@/constants/socket.events";
 
 const API_END_POINT = `${env.BASE_URL}/api/v1/meetings`
 axios.defaults.withCredentials = true
@@ -120,6 +121,7 @@ export const meetingService = {
 
     }
   },
+
   async waiting() {
     const state = useMeetingStore.getState();
 
@@ -134,6 +136,7 @@ export const meetingService = {
 
     }
   },
+
   async live() {
     const state = useMeetingStore.getState();
 
@@ -181,6 +184,7 @@ export const meetingService = {
 
     }
   },
+
   async update(payload: { meetingId: string } & Partial<Meeting>) {
     const state = useMeetingStore.getState();
 
@@ -269,7 +273,7 @@ export const meetingService = {
 
   async create(input: Partial<Meeting>) {
     // * we have create meeting here and then send the url
-
+    const state = useMeetingStore.getState();
     try {
       console.log(input);
 
@@ -284,6 +288,7 @@ export const meetingService = {
       console.log(response);
 
       if (response.data.success) {
+        state.addMeetings(response.data.meeting);
         toast.success(response.data.message);
       }
 
@@ -315,9 +320,48 @@ export const meetingService = {
 
       console.log(error.response.data.message);
       toast.error(error.response.data.message);
+      throw error;
     }
 
   },
+
+  async startMeeting(meetingId: string, passcode: string) {
+    try {
+
+      console.log("MeetingId :", meetingId)
+      console.log("Passcode  :", passcode);
+      ;
+
+      const response = await axios.get(`${API_END_POINT}/${meetingId}`);
+
+      // return response.data.meeting;
+
+      // * connect to  socket sever 
+      socketService.connect();
+
+      // * now start meeting :
+      socketService.emit(CLIENT_EVENTS.MEETING_START,
+        {
+          meetingId,
+          passcode
+        }
+      )
+
+      if (response.data.success) {
+        console.log(response.data);
+
+        toast.success("Meeting found — joining lobby")
+      }
+
+    } catch (error) {
+
+      socketService.disconnect();
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+      throw error;
+    }
+  },
+
   async participants(_id: string) { await delay(300); return seedParticipants; },
   async messages(_id: string) { await delay(300); return seedMessages; },
 

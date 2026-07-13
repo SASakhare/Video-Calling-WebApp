@@ -1,12 +1,16 @@
 import { Socket } from "socket.io-client";
 import { socket } from "@/lib/socket";
-
-
+import { registerSocketHandlers } from "@/socket/register";
+// interface Payload {
+//     meetingId: string,
+//     passcode: string,
+// }
 
 class SocketService {
 
     private socket: Socket
 
+    private initialized = false;
 
     constructor() {
         this.socket = socket
@@ -14,18 +18,20 @@ class SocketService {
 
     //* Connect to socket server
 
-    connect(token: string) {
+    connect() {
 
         if (this.socket.connected) {
-            console.log("Socket already connected to sever");
+            console.log("Socket already connected");
             return;
         }
 
-        this.socket.auth = {
-            token,
-        };
 
         this.socket.connect();
+
+        if (!this.initialized) {
+            registerSocketHandlers(this.socket);
+            this.initialized = true;
+        }
         console.log("Socket Connected to Server");
 
     }
@@ -53,7 +59,6 @@ class SocketService {
 
 
     // * Listen Event :
-
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

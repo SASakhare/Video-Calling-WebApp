@@ -58,7 +58,11 @@ export const getMeetingDB = async (userId, meetingId) => {
         // * create Meeting and return Meeting details
 
         const meeting = await Meeting.findOne({ meetingId });
-        console.log(meeting);
+        // console.log(meeting);
+
+        // if(meeting==){
+        //     throw new CustomError("Meeting Not Found",400)
+        // }
         
         if (meeting.hostId != userId) {
             throw new CustomError("Error while Meetings Fetching", 503);

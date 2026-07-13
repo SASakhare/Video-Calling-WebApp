@@ -12,6 +12,10 @@ import { GlassCard } from "@/components/common/GlassCard";
 import { MeetingCodeInput } from "@/components/meetings/MeetingCodeInput";
 import { meetingService } from "@/services/meeting.service";
 import { socketService } from "@/services/socket.service";
+import { CLIENT_EVENTS } from "@/constants/socket.events";
+
+
+
 export default function JoinMeeting() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
@@ -34,12 +38,18 @@ export default function JoinMeeting() {
     setLoading(true);
     setError(null);
     try {
-      const meetingId = searchParams.get('meetingId')
-      const result = await meetingService.validateCode(meetingId);
 
+      const meetingId = searchParams.get("meetingId")
       // * make the socket connection :
-      socketService.connect("token--token--token--token");
 
+      console.log('code :',code);
+      
+      socketService.connect();
+
+      socketService.emit(CLIENT_EVENTS.MEETING_JOIN, {
+        meetingId,
+        passcode: code,
+      })
       // navigate(`/meetings/lobby/${result.meetingId}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -26,6 +26,7 @@ export default function MeetingLobby() {
   const user = useAuthStore((s) => s.user);
   const setSelectedCamera = useMeetingStore((s) => s.setSelectedCamera);
   const setSelectedMic = useMeetingStore((s) => s.setSelectedMic);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const meeting = useQuery({
     queryKey: ["meeting", id],
@@ -61,6 +62,32 @@ export default function MeetingLobby() {
     if (selectedMic) setSelectedMic(selectedMic);
   }, [selectedCamera, selectedMic, setSelectedCamera, setSelectedMic]);
 
+  const handleStart = async () => {
+    stop();
+    // Release media before navigating
+
+    // if (meeting.data?.waitingRoom) {
+    //   navigate(`/meetings/waiting/${id}`);
+    // } else {
+    //   navigate(`/meetings/room/${id}`);
+    // }
+
+
+    const meetingId = id;
+    const passcode = meeting.data.meetingPassword;
+    const result = await meetingService.startMeeting(meetingId, passcode);
+
+    // * make the socket connection :
+    // if (result) {
+
+    //   socketService.connect({ meetingId, passcode: code });
+    // }
+
+    // navigate(`/meetings/lobby/${result.meetingId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+  };
   const handleJoin = () => {
     stop(); // Release media before navigating
     // if (meeting.data?.waitingRoom) {
@@ -70,7 +97,7 @@ export default function MeetingLobby() {
     // }
 
     // * meeting => waitingRoom 
-      
+
     // * meeting => room join 
   };
 
@@ -129,7 +156,7 @@ export default function MeetingLobby() {
             className={cn(
               "h-12 w-12 rounded-full p-0",
               !micOn &&
-                "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
+              "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
             )}
             title={micOn ? "Mute microphone" : "Unmute microphone"}
           >
@@ -140,7 +167,7 @@ export default function MeetingLobby() {
             )}
           </Button>
 
-        {/* // * Camera Toggle button */}
+          {/* // * Camera Toggle button */}
           <Button
             onClick={toggleCamera}
             variant="outline"
@@ -148,7 +175,7 @@ export default function MeetingLobby() {
             className={cn(
               "h-12 w-12 rounded-full p-0",
               !cameraOn &&
-                "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
+              "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
             )}
             title={cameraOn ? "Turn off camera" : "Turn on camera"}
           >
@@ -213,7 +240,7 @@ export default function MeetingLobby() {
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
                   <Users className="h-3 w-3" />
-                  Hosted by {m.hostName}
+                  Hosted by {m.hostId}
                 </span>
                 {m.scheduledAt && (
                   <span className="inline-flex items-center gap-1">
@@ -230,41 +257,9 @@ export default function MeetingLobby() {
 
           <Separator className="bg-border/60" />
 
-          {/* Participants already in */}
-          {pList.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Already in the meeting
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {pList.map((p) => (
-                    <Avatar
-                      key={p.id}
-                      className="h-8 w-8 border-2 border-background"
-                    >
-                      <AvatarImage src={p.avatar} />
-                      <AvatarFallback className="bg-gradient-brand text-[10px] text-primary-foreground">
-                        {p.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-                {(participants.data?.length ?? 0) > 5 && (
-                  <span className="text-xs text-muted-foreground">
-                    +{(participants.data?.length ?? 0) - 5} more
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* //* Passcode input (if meeting requires one) */}
-          {m?.passcode && (
+          {m?.meetingPassword && (
             <div className="space-y-1.5">
               <Label
                 htmlFor="passcode"
@@ -274,6 +269,7 @@ export default function MeetingLobby() {
                 Meeting passcode
               </Label>
               <Input
+                value={m?.meetingPassword}
                 id="passcode"
                 type="text"
                 placeholder="Enter passcode"
@@ -283,21 +279,14 @@ export default function MeetingLobby() {
             </div>
           )}
 
-          {/* Waiting room notice */}
-          {m?.waitingRoom && (
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
-              <Shield className="mb-0.5 inline h-3.5 w-3.5 mr-1" />
-              This meeting has a waiting room. The host will admit you.
-            </div>
-          )}
 
           {/* Join CTA */}
           <Button
-            onClick={handleJoin}
+            onClick={handleStart}
             size="lg"
             className="h-12 w-full rounded-full bg-gradient-brand text-primary-foreground btn-glow"
           >
-            Join now
+            Start Meeting
             <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
 
@@ -311,7 +300,7 @@ export default function MeetingLobby() {
         </div>
 
         {/* Ready status */}
-        
+
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
             {cameraOn && micOn

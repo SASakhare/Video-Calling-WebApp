@@ -1,6 +1,6 @@
 import { Server } from "socket.io"
 import { env } from "../config/env.js";
-
+import { socketAuthMiddleware } from "./middleware/auth.middleware.js";
 export let io;
 
 export const initializeSocket=(server)=>{
@@ -12,6 +12,9 @@ export const initializeSocket=(server)=>{
         },
         transports:['websocket']
     });
+
+    // * Register Middleware
+    io.use(socketAuthMiddleware)
 
     return io
 }

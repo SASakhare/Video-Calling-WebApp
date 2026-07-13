@@ -10,7 +10,7 @@ export const createMeeting = async (req, res) => {
         const data = req.body;
         console.log(data);
         const passcode = data.passcode ? data.passcode : nanoid(5);
-        const hashPasscode = await hashPassword(passcode)
+        const hashPasscode = passcode
         const meetingId = uuid();
         const meetingLink = createMeetingLink(meetingId);
         const meetingData = {
@@ -83,7 +83,7 @@ export const getMeeting = async (req, res) => {
     try {
 
         const meetingId = req.params.meetingId;
-        const userId=req.userId;
+        const userId = req.userId;
         console.log('meetingId (getMeeting) :', meetingId);
         console.log('userId (getMeeting) :', userId);
 

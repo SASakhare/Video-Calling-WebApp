@@ -11,6 +11,8 @@ export const registerSocketEvents = (io) => {
 
         console.log(`Socket Connected : ${socket.id}`);
 
+        // * we create socket room meeting  and meeting Id
+
         // * registering Meeting Events
         registerMeetingEvents(io, socket);
 
