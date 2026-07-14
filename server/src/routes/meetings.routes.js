@@ -1,6 +1,6 @@
 import express  from "express"
 import { get_user } from "../middlewares/auth.middleware.js";
-import { createMeeting,getMeetings,getMeeting,updateMeeting,cancelMeeting } from "../controllers/meeting.controller.js";
+import {getMeetingWithPasscode ,createMeeting,getMeetings,getMeeting,updateMeeting,cancelMeeting } from "../controllers/meeting.controller.js";
 
 export const router=express.Router();
 
@@ -22,6 +22,8 @@ router.get('/',get_user,getMeetings);
 //* get specific meeting with meeting id
 
 router.get('/:meetingId',get_user,getMeeting)
+
+router.get('/:meetingId/passcode/:passcode',get_user,getMeetingWithPasscode)
 
 // * update meeting with meeting id
 

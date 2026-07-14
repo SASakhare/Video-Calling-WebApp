@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid"
 import { hashPassword } from "../utils/password.js";
 import { createMeetingLink } from "../utils/meeting.utils.js";
-import { createMeetingDB, getMeetingsDB, getMeetingDB, updateMeetingDB, cancelMeetingDB } from "../services/meeting.database.service.js";
+import {getMeetingByMeetingIdDB,createMeetingDB, getMeetingsDB, getMeetingDB, updateMeetingDB, cancelMeetingDB } from "../services/meeting.database.service.js";
 import { nanoid } from "nanoid";
 
 export const createMeeting = async (req, res) => {
@@ -88,6 +88,32 @@ export const getMeeting = async (req, res) => {
         console.log('userId (getMeeting) :', userId);
 
         const meeting = await getMeetingDB(userId, meetingId);
+
+        res.status(200).json({
+            success: true,
+            message: "Meeting Fetched Successfully",
+            meeting
+        })
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
+
+}
+
+export const getMeetingWithPasscode = async (req, res) => {
+
+    try {
+
+        const meetingId = req.params.meetingId;
+        const passcode = req.params.passcode;
+        console.log('meetingId (getMeeting) :', meetingId);
+        console.log('passcode (getMeeting) :', passcode);
+
+        const meeting = await getMeetingByMeetingIdDB(meetingId);
 
         res.status(200).json({
             success: true,

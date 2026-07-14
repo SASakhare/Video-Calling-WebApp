@@ -63,7 +63,7 @@ export const getMeetingDB = async (userId, meetingId) => {
         // if(meeting==){
         //     throw new CustomError("Meeting Not Found",400)
         // }
-        
+
         if (meeting.hostId != userId) {
             throw new CustomError("Error while Meetings Fetching", 503);
         }
@@ -82,6 +82,7 @@ export const getMeetingDB = async (userId, meetingId) => {
     }
 
 }
+
 export const getMeetingByMeetingIdDB = async (meetingId) => {
 
 
