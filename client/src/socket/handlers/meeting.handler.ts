@@ -26,6 +26,10 @@ export const registerMeetingHandlers = (socket: Socket) => {
         }
     )
 
+    // socket.on(
+    //     SERVER_EVENTS.
+    // )
+
     // * ----------------- Meeting Error Event ----------------
 
     socket.on(

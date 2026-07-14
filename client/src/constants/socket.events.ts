@@ -14,6 +14,11 @@ export const CLIENT_EVENTS = {
     MEETING_ADMIT: "meeting:admit",
     MEETING_REJECT: "meeting:reject",
 
+    // *  Participant 
+    PARTICIPANT_ALLOW: "participant:allow",
+    PARTICIPANT_REJECT: "participant:reject",
+
+
     //* Chat
     CHAT_SEND: "chat:send",
     CHAT_TYPING: "chat:typing",
@@ -49,6 +54,9 @@ export const SERVER_EVENTS = {
     PARTICIPANTS_UPDATED: "participants:updated",
     PARTICIPANT_JOINED: "participant:joined",
     PARTICIPANT_LEFT: "participant:left",
+    PARTICIPANT_WAITING: "participant:waiting",
+    PARTICIPANT_ALLOWED: "participant:allowed",
+    PARTICIPANT_REJECTED: "participant:rejected",
 
     //* Chat
     CHAT_RECEIVED: "chat:received",

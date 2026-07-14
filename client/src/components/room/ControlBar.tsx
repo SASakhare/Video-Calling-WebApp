@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Separator } from "@radix-ui/react-separator";
 
 interface ControlBarProps {
   micOn: boolean;

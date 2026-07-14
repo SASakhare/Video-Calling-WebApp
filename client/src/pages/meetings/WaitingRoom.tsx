@@ -36,21 +36,9 @@ export default function WaitingRoom() {
     stop,
   } = useMediaPreview();
 
-  //* Auto-admit simulation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAdmitted(true);
-      toast.success("The host has admitted you", {
-        description: "Joining the meeting room…",
-      });
-      setTimeout(() => {
-        stop();
-        navigate(`/meetings/room/${id}`);
-      }, 1200);
-    }, AUTO_ADMIT_MS);
 
-    return () => clearTimeout(timer);
-  }, [id, navigate, stop]);
+
+
 
   //* Elapsed counter
   useEffect(() => {
@@ -60,9 +48,11 @@ export default function WaitingRoom() {
     return () => clearInterval(interval);
   }, []);
 
+
+  // * Leaving Waiting Room Handle
   const handleLeave = () => {
     stop();
-    navigate("/dashboard");
+    // navigate("/dashboard");
     toast("You left the waiting room");
   };
 
@@ -131,7 +121,7 @@ export default function WaitingRoom() {
           {m && (
             <p className="mt-1 text-sm font-medium">
               {m.title}
-              <span className="text-muted-foreground"> · {m.hostName}</span>
+              <span className="text-muted-foreground"> · {m.hostId}</span>
             </p>
           )}
         </div>

@@ -71,7 +71,8 @@ export default function MeetingLobby() {
     // } else {
     //   navigate(`/meetings/room/${id}`);
     // }
-
+    
+    navigate(`/meetings/room/${id}`);
 
     const meetingId = id;
     const passcode = meeting.data.meetingPassword;

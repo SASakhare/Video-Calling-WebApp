@@ -151,6 +151,7 @@ export const meetingService = {
 
     }
   },
+
   async cancelled() {
     const state = useMeetingStore.getState();
 
@@ -213,6 +214,8 @@ export const meetingService = {
 
 
   },
+
+
   getMeetingDuration(
     actualStartTime?: string,
     actualEndTime?: string
@@ -257,6 +260,32 @@ export const meetingService = {
       const response = await axios.get(`${API_END_POINT}/${id}`);
 
       if (response.data.success) {
+        console.log(response);
+      }
+
+      return response.data.meeting;
+
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message)
+
+    }
+
+    return;
+  },
+  async getMeetingWithPasscode(id: string, passcode: string) {
+
+    console.log('Inside get Meeting with Passcode function ');
+    console.log("id :", id);
+
+
+    try {
+      const response = await axios.get(`${API_END_POINT}/${id}/passcode/${passcode}`);
+
+      const state = useMeetingStore.getState();
+      if (response.data.success) {
+        state.setCurrentMeeting(response.data.meeting)
+        toast.success(response.data.message);
         console.log(response);
       }
 
@@ -334,6 +363,11 @@ export const meetingService = {
 
       const response = await axios.get(`${API_END_POINT}/${meetingId}`);
 
+      const state = useMeetingStore.getState();
+
+      // state.currentMeeting = response.data.meeting;
+
+      state.setCurrentMeeting(response.data.meeting)
       // return response.data.meeting;
 
       // * connect to  socket sever 

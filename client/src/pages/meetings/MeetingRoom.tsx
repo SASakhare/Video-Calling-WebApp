@@ -84,10 +84,10 @@ export default function MeetingRoom() {
   // Local user participant representation
   const selfParticipant = useMemo<Participant>(() => {
     return {
-      id: user?.id || "u_self",
-      name: user?.name || "You",
+      id: user?.userId || "u_self",
+      name: user?.username || "You",
       avatar: user?.avatar,
-      isHost: meetingQuery.data?.hostId === user?.id || user?.role === "host",
+      isHost: meetingQuery.data?.hostId === user?.userId,
       isMuted: !micOn,
       isCameraOn: cameraOn,
       isSharing: screenSharing,
@@ -105,10 +105,10 @@ export default function MeetingRoom() {
   useEffect(() => {
     if (participantsQuery.data) {
       // Exclude self since it's locally controlled
-      const remote = participantsQuery.data.filter((p) => p.id !== user?.id);
+      const remote = participantsQuery.data.filter((p) => p.id !== user?.userId);
       setParticipants(remote);
     }
-  }, [participantsQuery.data, setParticipants, user?.id]);
+  }, [participantsQuery.data, setParticipants, user?.userId]);
 
   useEffect(() => {
     if (messagesQuery.data && messages.length === 0) {
@@ -116,75 +116,23 @@ export default function MeetingRoom() {
     }
   }, [messagesQuery.data, addMessage, messages.length]);
 
-  // Simulated notifications: New remote participant joins after 8s
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const newP: Participant = {
-        id: "p_temp",
-        name: "Taylor Vance",
-        avatar: "https://api.dicebear.com/9.x/glass/svg?seed=taylor",
-        isMuted: true,
-        isCameraOn: true,
-        connection: "excellent",
-        joinedAt: new Date().toISOString(),
-      };
-      setParticipants([...participants, newP]);
-      toast.info("Taylor Vance joined the meeting");
+  //^ Simulated notifications: New remote participant joins after 8s
 
-      // Post system join message
-      addMessage({
-        id: `sys_${Math.random()}`,
-        meetingId: id!,
-        senderId: "system",
-        senderName: "Meetly",
-        content: "Taylor Vance joined the meeting",
-        createdAt: new Date().toISOString(),
-        system: true,
-      });
-    }, 8000);
 
-    return () => clearTimeout(timer);
-  }, [id, participants, setParticipants, addMessage]);
 
-  // Simulated active speaker rotation switcher
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const activeList = participants.filter((p) => p.isCameraOn);
-      if (activeList.length === 0) return;
-      const randomP = activeList[Math.floor(Math.random() * activeList.length)];
-      
-      // Update participants state setting isSpeaking flags
-      const updated = participants.map((p) => ({
-        ...p,
-        isSpeaking: p.id === randomP.id,
-      }));
-      setParticipants(updated);
-      setActiveSpeaker(randomP.id);
-    }, 5500);
 
-    return () => clearInterval(interval);
-  }, [participants, setParticipants, setActiveSpeaker]);
 
-  // Chat notification increments
-  useEffect(() => {
-    if (!chatOpen && messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      if (!lastMsg.system && lastMsg.senderId !== user?.id) {
-        setUnreadChatCount((c) => c + 1);
-      }
-    }
-  }, [messages, chatOpen, user?.id]);
 
-  useEffect(() => {
-    if (chatOpen) setUnreadChatCount(0);
-  }, [chatOpen]);
+  //^ Simulated active speaker rotation switcher
+
+
 
   const handleSendMessage = (text: string) => {
     const newMsg: ChatMessage = {
       id: Math.random().toString(),
       meetingId: id!,
-      senderId: user?.id || "u_self",
-      senderName: user?.name || "You",
+      senderId: user?.userId || "u_self",
+      senderName: user?.username || "You",
       content: text,
       createdAt: new Date().toISOString(),
     };
@@ -264,7 +212,7 @@ export default function MeetingRoom() {
                 onClose={() => setChatOpen(false)}
                 messages={messages}
                 onSendMessage={handleSendMessage}
-                selfId={user?.id || "u_self"}
+                selfId={user?.userId || "u_self"}
               />
             </motion.div>
           )}

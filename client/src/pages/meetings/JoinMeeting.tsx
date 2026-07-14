@@ -41,7 +41,8 @@ export default function JoinMeeting() {
 
       const meetingId = searchParams.get("meetingId")
       // * make the socket connection :
-
+      await meetingService.getMeetingWithPasscode(meetingId,code);
+      
       console.log('code :',code);
       
       socketService.connect();
