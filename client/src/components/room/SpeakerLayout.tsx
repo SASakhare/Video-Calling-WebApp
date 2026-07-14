@@ -9,50 +9,193 @@ interface SpeakerLayoutProps {
   onPinToggle: (id: string) => void;
 }
 
-export function SpeakerLayout({
+export default function SpeakerLayout({
   participants,
   selfParticipant,
   activeSpeakerId,
   pinnedId,
   onPinToggle,
 }: SpeakerLayoutProps) {
-  const allList = [selfParticipant, ...participants];
 
-  // Speaker calculation priority: Pinned > ActiveSpeaker > Host > You
-  const activeSpeaker = allList.find((p) => p.id === (pinnedId || activeSpeakerId)) 
-    || allList.find((p) => p.isSpeaking) 
-    || allList.find((p) => p.isHost) 
-    || selfParticipant;
+  /*
+    Participant priority:
 
-  const filmstrip = allList.filter((p) => p.id !== activeSpeaker.id);
+    1. Pinned participant
+    2. Active speaker
+    3. Host
+    4. Self preview
+
+  */
+
+  const allParticipants = [
+    selfParticipant,
+    ...participants.filter(
+      (p) => p.id !== selfParticipant.id
+    ),
+  ];
+
+
+  const displayedParticipant =
+    allParticipants.find(
+      (p) => p.id === pinnedId
+    )
+    ??
+    allParticipants.find(
+      (p) => p.id === activeSpeakerId
+    )
+    ??
+    allParticipants.find(
+      (p) => p.isSpeaking
+    )
+    ??
+    allParticipants.find(
+      (p) => p.isHost
+    )
+    ??
+    selfParticipant;
+
+
+
+  const thumbnails = allParticipants.filter(
+    (p) => p.id !== displayedParticipant.id
+  );
+
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full p-4 gap-4 overflow-hidden">
-      {/* Active Speaker Large Video Block */}
-      <div className="flex-1 flex items-center justify-center min-h-0">
+
+    <div className="
+      flex
+      flex-col
+      h-full
+      w-full
+      overflow-hidden
+      bg-slate-950
+    ">
+
+
+      {/* ================= MAIN STAGE ================= */}
+
+      <div className="
+        flex-1
+        min-h-0
+        flex
+        items-center
+        justify-center
+        p-4
+      ">
+
+
         <ParticipantTile
-          participant={activeSpeaker}
-          isSelf={activeSpeaker.id === selfParticipant.id}
-          isPinned={pinnedId === activeSpeaker.id}
-          onPinToggle={() => onPinToggle(activeSpeaker.id)}
-          className="w-full max-w-5xl h-full max-h-[60vh] aspect-video"
+
+          participant={displayedParticipant}
+
+          isSelf={
+            displayedParticipant.id === selfParticipant.id
+          }
+
+          isPinned={
+            displayedParticipant.id === pinnedId
+          }
+
+          onPinToggle={() =>
+            onPinToggle(displayedParticipant.id)
+          }
+
+
+          /*
+             Important
+
+             No fixed height
+             Parent controls size
+
+          */
+
+          className="
+            w-full
+            h-full
+            max-w-7xl
+            rounded-2xl
+          "
+
         />
+
       </div>
 
-      {/* Filmstrip film layout at the bottom */}
-      <div className="h-[120px] md:h-[160px] shrink-0 w-full overflow-x-auto flex items-center justify-start gap-3 px-2 py-1 scrollbar-thin select-none">
-        {filmstrip.map((p) => (
-          <ParticipantTile
-            key={p.id}
-            participant={p}
-            isSelf={p.id === selfParticipant.id}
-            isPinned={pinnedId === p.id}
-            onPinToggle={() => onPinToggle(p.id)}
-            className="h-full aspect-video shrink-0 rounded-xl"
-          />
-        ))}
-      </div>
+
+
+      {/* ================= BOTTOM FILMSTRIP ================= */}
+
+
+      {
+        thumbnails.length > 0 && (
+
+          <div className="
+            shrink-0
+            h-28
+            px-4
+            pb-3
+          ">
+
+
+            <div className="
+              h-full
+              flex
+              items-center
+              justify-center
+              gap-3
+              overflow-x-auto
+              scrollbar-thin
+            ">
+
+
+              {
+                thumbnails.map((participant) => (
+
+                  <ParticipantTile
+
+                    key={participant.id}
+
+                    participant={participant}
+
+                    isSelf={
+                      participant.id === selfParticipant.id
+                    }
+
+                    isPinned={
+                      participant.id === pinnedId
+                    }
+
+                    onPinToggle={() =>
+                      onPinToggle(participant.id)
+                    }
+
+
+                    className="
+                      h-full
+                      w-44
+                      shrink-0
+                      rounded-xl
+                      cursor-pointer
+                      transition-transform
+                      hover:scale-105
+                    "
+
+                  />
+
+                ))
+              }
+
+
+            </div>
+
+
+          </div>
+
+        )
+      }
+
+
     </div>
+
   );
 }
-export default SpeakerLayout;

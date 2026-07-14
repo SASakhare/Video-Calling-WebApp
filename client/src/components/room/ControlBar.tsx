@@ -66,8 +66,23 @@ export function ControlBar({
   const [reactionOpen, setReactionOpen] = useState(false);
 
   return (
-    <div className="h-20 shrink-0 w-full bg-slate-950/80 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-6 z-40 relative select-none">
-      
+    // <div className="h-20 shrink-0 w-full bg-slate-950/80 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-6 z-40 relative select-none">
+    <div className="
+        h-16
+        shrink-0
+        w-full
+        bg-slate-950/90
+        backdrop-blur-xl
+        border-t
+        border-white/5
+        flex
+        items-center
+        justify-between
+        px-4
+        z-40
+        relative
+        select-none
+        ">
       {/* Left panel duration timer info details */}
       <div className="hidden sm:flex items-center gap-3">
         <span className="font-mono text-sm font-medium text-white/80 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">

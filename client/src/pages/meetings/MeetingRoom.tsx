@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
-
+import MeetingLayoutManager from "@/components/room/MeetingLayoutManager";
 import { useMeetingStore } from "@/store/meeting.store";
 import { useUIStore } from "@/store/ui.store";
 import { useAuthStore } from "@/store/auth.store";
@@ -12,7 +12,6 @@ import { useMeetingTimer } from "@/hooks/useMeetingTimer";
 import { meetingService } from "@/services/meeting.service";
 
 import { GridLayout } from "@/components/room/GridLayout";
-import { SpeakerLayout } from "@/components/room/SpeakerLayout";
 import { PresentationLayout } from "@/components/room/PresentationLayout";
 import { ControlBar } from "@/components/room/ControlBar";
 import { ChatPanel } from "@/components/room/ChatPanel";
@@ -21,7 +20,7 @@ import { ReactionOverlay } from "@/components/room/ReactionOverlay";
 import type { ChatMessage, Participant } from "@/types";
 
 export default function MeetingRoom() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>(); // * id :=> meetingId
   const navigate = useNavigate();
 
   // Zustand stores
@@ -82,6 +81,7 @@ export default function MeetingRoom() {
   });
 
   // Local user participant representation
+  //  * it run during rendering phase and run when dependency array item change
   const selfParticipant = useMemo<Participant>(() => {
     return {
       id: user?.userId || "u_self",
@@ -116,17 +116,8 @@ export default function MeetingRoom() {
     }
   }, [messagesQuery.data, addMessage, messages.length]);
 
-  //^ Simulated notifications: New remote participant joins after 8s
 
-
-
-
-
-
-  //^ Simulated active speaker rotation switcher
-
-
-
+  // * Handle Send Message  function :
   const handleSendMessage = (text: string) => {
     const newMsg: ChatMessage = {
       id: Math.random().toString(),
@@ -139,42 +130,15 @@ export default function MeetingRoom() {
     addMessage(newMsg);
   };
 
+  // * handle leave function which end the meeting and goto service page
   const handleLeave = () => {
     resetMeetingStore();
     toast.success("Meeting ended");
     navigate(`/meetings/summary/${id}`);
   };
 
-  // Layout selection render switcher
-  const renderLayout = () => {
-    const props = {
-      participants,
-      selfParticipant,
-      activeSpeakerId,
-      pinnedId: pinnedParticipantId,
-      onPinToggle: (pId: string) =>
-        setPinnedParticipant(pinnedParticipantId === pId ? null : pId),
-    };
 
-    switch (layoutMode) {
-      case "speaker":
-        return <SpeakerLayout {...props} />;
-      case "presentation":
-        return <PresentationLayout {...props} />;
-      case "grid":
-      default:
-        return (
-          <GridLayout
-            participants={participants}
-            selfParticipant={selfParticipant}
-            pinnedId={pinnedParticipantId}
-            onPinToggle={(pId: string) =>
-              setPinnedParticipant(pinnedParticipantId === pId ? null : pId)
-            }
-          />
-        );
-    }
-  };
+
 
   if (meetingQuery.isLoading) {
     return (
@@ -185,85 +149,259 @@ export default function MeetingRoom() {
     );
   }
 
+
+
   return (
-    <div className="flex-1 flex flex-col min-h-0 min-w-0 bg-slate-950 overflow-hidden relative">
-      {/* Reaction Visual Float Area */}
-      <ReactionOverlay
-        reactions={activeReactions}
-        onRemoveReaction={removeReaction}
-      />
+    <div
+      className="
+      h-screen
+      w-screen
+      flex
+      flex-col
+      bg-slate-950
+      overflow-hidden
+    "
+    >
 
-      {/* Main room grid display zone */}
-      <div className="flex-1 flex min-h-0 min-w-0 relative overflow-hidden">
-        {renderLayout()}
+      {/* ================= MEETING AREA ================= */}
 
-        {/* Slide Panels */}
+      <div
+        className="
+        flex-1
+        relative
+        min-h-0
+        overflow-hidden
+      "
+      >
+
+        {/* Layout */}
+
+        <div
+          className="
+          absolute
+          inset-0
+          flex
+          min-h-0
+          min-w-0
+        "
+        >
+
+          <MeetingLayoutManager
+            layoutMode={layoutMode}
+            participants={participants}
+            selfParticipant={selfParticipant}
+            activeSpeakerId={activeSpeakerId}
+            pinnedParticipantId={pinnedParticipantId}
+            onPinToggle={(participantId) =>
+              setPinnedParticipant(
+                pinnedParticipantId === participantId
+                  ? null
+                  : participantId
+              )
+            }
+          />
+
+        </div>
+
+
+
+        {/* Floating Reaction Layer */}
+
+        <ReactionOverlay
+          reactions={activeReactions}
+          onRemoveReaction={removeReaction}
+        />
+
+
+
+        {/* ================= SIDE PANELS ================= */}
+
+
         <AnimatePresence>
+
+
           {chatOpen && (
+
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="h-full relative z-40"
+
+              initial={{
+                x: "100%"
+              }}
+
+              animate={{
+                x: 0
+              }}
+
+              exit={{
+                x: "100%"
+              }}
+
+              transition={{
+                duration: 0.25
+              }}
+
+              className="
+              absolute
+              right-0
+              top-0
+              h-full
+              z-40
+            "
+
             >
+
               <ChatPanel
+
                 open={chatOpen}
-                onClose={() => setChatOpen(false)}
+
+                onClose={() =>
+                  setChatOpen(false)
+                }
+
                 messages={messages}
+
                 onSendMessage={handleSendMessage}
-                selfId={user?.userId || "u_self"}
+
+                selfId={
+                  user?.userId ?? "self"
+                }
+
               />
+
+
             </motion.div>
+
           )}
+
+
 
           {participantsOpen && (
+
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="h-full relative z-40"
+
+              initial={{
+                x: "100%"
+              }}
+
+              animate={{
+                x: 0
+              }}
+
+              exit={{
+                x: "100%"
+              }}
+
+              transition={{
+                duration: 0.25
+              }}
+
+              className="
+              absolute
+              right-0
+              top-0
+              h-full
+              z-40
+            "
+
             >
+
               <ParticipantsPanel
+
                 open={participantsOpen}
-                onClose={() => setParticipantsOpen(false)}
-                participants={participants}
-                selfParticipant={selfParticipant}
-                pinnedId={pinnedParticipantId}
-                onPinToggle={(pId: string) =>
-                  setPinnedParticipant(pinnedParticipantId === pId ? null : pId)
+
+                onClose={() =>
+                  setParticipantsOpen(false)
                 }
+
+                participants={participants}
+
+                selfParticipant={selfParticipant}
+
+                pinnedId={pinnedParticipantId}
+
+                onPinToggle={(id) =>
+
+
+                  setPinnedParticipant(
+                    pinnedParticipantId === id
+                      ? null
+                      : id
+                  )
+
+                }
+
               />
+
+
             </motion.div>
+
           )}
+
         </AnimatePresence>
+
+
       </div>
 
-      {/* Control Bar controls */}
+
+
+
+      {/* ================= CONTROL BAR ================= */}
+
+
       <ControlBar
+
         micOn={micOn}
+
         cameraOn={cameraOn}
+
         screenSharing={screenSharing}
+
         handRaised={handRaised}
+
         recording={recording}
+
         chatOpen={chatOpen}
+
         participantsOpen={participantsOpen}
+
         unreadCount={unreadChatCount}
-        participantCount={participants.length + 1}
+
+        participantCount={
+          participants.length + 1
+        }
+
         layoutMode={layoutMode}
+
         meetingTimer={formatTimer()}
+
         onToggleMic={toggleMic}
+
         onToggleCamera={toggleCamera}
+
         onToggleShare={toggleShare}
+
         onToggleHand={toggleHand}
+
         onToggleRecording={toggleRecording}
-        onToggleChat={() => setChatOpen(!chatOpen)}
-        onToggleParticipants={() => setParticipantsOpen(!participantsOpen)}
+
+        onToggleChat={() =>
+          setChatOpen(!chatOpen)
+        }
+
+        onToggleParticipants={() =>
+          setParticipantsOpen(!participantsOpen)
+        }
+
         onChangeLayout={setLayoutMode}
+
         onSendReaction={addReaction}
+
         onLeave={handleLeave}
+
       />
+
+
     </div>
   );
+
 }

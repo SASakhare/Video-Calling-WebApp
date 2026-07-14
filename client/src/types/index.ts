@@ -28,6 +28,7 @@ export interface Participant {
   reaction?: string | null;
   connection: "excellent" | "good" | "poor";
   joinedAt: string;
+  isPinned?: boolean;
 }
 
 export interface Meeting {

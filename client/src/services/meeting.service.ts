@@ -396,8 +396,19 @@ export const meetingService = {
     }
   },
 
-  async participants(_id: string) { await delay(300); return seedParticipants; },
-  async messages(_id: string) { await delay(300); return seedMessages; },
+  // * here we have to get all participant of that meeting  by using api call
+  async participants(_id: string) {
+    await delay(300);
+    return seedParticipants;
+
+  },
+
+  // * here we have to get all messages ie. we have to to whoever joined in mid of meeting and upcoming and new message get via websocket.
+  async messages(_id: string) {
+    await delay(300);
+
+    return seedMessages;
+  },
 
   /** Generate an .ics calendar file blob */
   generateCalendarEvent(meeting: Meeting & { code?: string }): Blob {

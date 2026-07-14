@@ -7,6 +7,11 @@ interface Reaction {
   emoji: string;
   timestamp: number;
 }
+type MeetingLayout =
+  | "speaker"
+  | "gallery"
+  | "sidebar";
+
 
 interface MeetingState {
   // * ----------------- current Meeting -----------------------------
@@ -23,9 +28,18 @@ interface MeetingState {
   addMeetings: (meeting: Meeting) => void;
   updateMeeting: (meeting: Meeting) => void;
   removeMeeting: (meetingId: string) => void;
-  
-  // * -------------------- Live Meeting --------------------------------
 
+  // * Live Meeting layout 
+
+  layout: MeetingLayout;
+
+  setLayout: (layout: MeetingLayout) => void;
+
+  pinParticipant: (participantId: string | null) => void;
+
+  unpinParticipant: () => void;
+
+  // * -------------------- Live Meeting --------------------------------
   micOn: boolean;
   cameraOn: boolean;
   screenSharing: boolean;
@@ -99,6 +113,22 @@ export const useMeetingStore = create<MeetingState>()(
             (m) => m.meetingId !== meetingId
           ),
         })),
+
+      layout: "speaker",
+
+      setLayout: (layout) =>
+        set({ layout }),
+
+      pinParticipant: (participantId) =>
+        set({
+          pinnedParticipantId: participantId,
+        }),
+
+      unpinParticipant: () =>
+        set({
+          pinnedParticipantId: null,
+        }),
+
       micOn: true,
       cameraOn: true,
       screenSharing: false,
@@ -160,3 +190,39 @@ export const useMeetingStore = create<MeetingState>()(
     }
   )
 );
+
+export const getDisplayedParticipant = (
+  participants: Participant[],
+  pinnedParticipantId: string | null,
+  activeSpeakerId: string | null
+) => {
+
+  if (pinnedParticipantId) {
+
+    const pinned = participants.find(
+      p => p.id === pinnedParticipantId
+    );
+
+    if (pinned) return pinned;
+
+  }
+
+  if (activeSpeakerId) {
+
+    const active = participants.find(
+      p => p.id === activeSpeakerId
+    );
+
+    if (active) return active;
+
+  }
+
+  const host = participants.find(
+    p => p.isHost
+  );
+
+  if (host) return host;
+
+  return participants[0] ?? null;
+
+};
