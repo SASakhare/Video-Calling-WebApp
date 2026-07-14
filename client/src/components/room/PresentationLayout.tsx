@@ -6,54 +6,140 @@ interface PresentationLayoutProps {
   selfParticipant: Participant;
   activeSpeakerId: string | null;
   pinnedId: string | null;
+  participantsOpen: boolean;
+  chatOpen: boolean;
   onPinToggle: (id: string) => void;
 }
 
-export function PresentationLayout({
+export default function PresentationLayout({
   participants,
   selfParticipant,
   pinnedId,
+  participantsOpen,
+  chatOpen,
   onPinToggle,
 }: PresentationLayoutProps) {
-  const allList = [selfParticipant, ...participants];
-  
-  // Who is presenting? We'll prioritize anyone with isSharing flag, or fall back to Alex Rivera
-  const presenter = allList.find((p) => p.isSharing) || allList.find((p) => p.isHost) || selfParticipant;
+  const sidePanelOpen = participantsOpen || chatOpen;
+
+  const allParticipants = [
+    selfParticipant,
+    ...participants.filter((p) => p.id !== selfParticipant.id),
+  ];
+
+  const presenter =
+    allParticipants.find((p) => p.isSharing) ||
+    allParticipants.find((p) => p.isHost) ||
+    selfParticipant;
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row min-h-0 w-full p-4 gap-4 overflow-hidden">
-      {/* Screenshare presentation panel */}
-      <div className="flex-1 flex flex-col justify-center items-center relative overflow-hidden bg-slate-900 border border-white/5 rounded-2xl">
-        {/* Mock visual preview window content */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 flex flex-col justify-center items-center gap-4 text-center select-none z-10 p-6">
-          <div className="text-6xl animate-pulse">📊</div>
-          <div>
-            <h3 className="text-lg font-bold text-white/90">Q3 Roadmap Presentation.pdf</h3>
-            <p className="text-xs text-white/50 mt-1">Presented by {presenter.name}</p>
+    <div className="flex-1 h-full w-full overflow-hidden">
+
+      {/* ================= NO SIDE PANEL ================= */}
+
+      {!sidePanelOpen && (
+        <div className="flex h-full gap-4 p-4">
+
+          {/* Presentation */}
+
+          <div className="flex-1 relative overflow-hidden rounded-2xl border border-white/5 bg-slate-900">
+
+            <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 flex flex-col items-center justify-center">
+
+              <div className="text-6xl animate-pulse">
+                📊
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-white">
+                Q3 Roadmap Presentation.pdf
+              </h3>
+
+              <p className="text-sm text-white/50">
+                Presented by {presenter.name}
+              </p>
+
+              <div className="mt-5 rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs text-primary">
+                LIVE SCREEN SHARE
+              </div>
+
+            </div>
+
           </div>
-          <div className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-xs text-primary animate-pulse mt-4">
-            LIVE SCREEN SHARE
+
+          {/* Right FilmStrip */}
+
+          <div className="w-[280px] shrink-0 overflow-y-auto flex flex-col gap-4 px-1">
+
+            {allParticipants.map((participant) => (
+              <ParticipantTile
+                key={participant.id}
+                participant={participant}
+                isSelf={participant.id === selfParticipant.id}
+                isPinned={participant.id === pinnedId}
+                onPinToggle={() => onPinToggle(participant.id)}
+                className="w-full aspect-video rounded-xl shrink-0"
+              />
+            ))}
+
           </div>
+
         </div>
+      )}
 
-        {/* Screen layout framing overlay border shadow */}
-        <div className="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_60px_rgba(0,0,0,0.6)]" />
-      </div>
+      {/* ================= CHAT / PEOPLE PANEL OPEN ================= */}
 
-      {/* Side filmstrip column vertical layout list */}
-      <div className="w-full md:w-[220px] shrink-0 md:h-full overflow-y-auto flex md:flex-col items-center justify-start gap-3 px-1 py-1 scrollbar-thin select-none">
-        {allList.map((p) => (
-          <ParticipantTile
-            key={p.id}
-            participant={p}
-            isSelf={p.id === selfParticipant.id}
-            isPinned={pinnedId === p.id}
-            onPinToggle={() => onPinToggle(p.id)}
-            className="w-[180px] md:w-full aspect-video shrink-0 rounded-xl"
-          />
-        ))}
-      </div>
+      {sidePanelOpen && (
+        <div className="flex h-full flex-col p-4 gap-4">
+
+          {/* Presentation */}
+
+          <div className="flex-1 relative overflow-hidden rounded-2xl border border-white/5 bg-slate-900">
+
+            <div className="absolute inset-0 bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 flex flex-col items-center justify-center">
+
+              <div className="text-6xl animate-pulse">
+                📊
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-white">
+                Q3 Roadmap Presentation.pdf
+              </h3>
+
+              <p className="text-sm text-white/50">
+                Presented by {presenter.name}
+              </p>
+
+              <div className="mt-5 rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs text-primary">
+                LIVE SCREEN SHARE
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Bottom FilmStrip */}
+
+          <div className="h-28 shrink-0 overflow-x-auto">
+
+            <div className="flex h-full items-center gap-3">
+
+              {allParticipants.map((participant) => (
+                <ParticipantTile
+                  key={participant.id}
+                  participant={participant}
+                  isSelf={participant.id === selfParticipant.id}
+                  isPinned={participant.id === pinnedId}
+                  onPinToggle={() => onPinToggle(participant.id)}
+                  className="h-full w-[180px] rounded-xl shrink-0"
+                />
+              ))}
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
-export default PresentationLayout;

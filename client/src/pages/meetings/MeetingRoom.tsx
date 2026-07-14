@@ -12,7 +12,6 @@ import { useMeetingTimer } from "@/hooks/useMeetingTimer";
 import { meetingService } from "@/services/meeting.service";
 
 import { GridLayout } from "@/components/room/GridLayout";
-import { PresentationLayout } from "@/components/room/PresentationLayout";
 import { ControlBar } from "@/components/room/ControlBar";
 import { ChatPanel } from "@/components/room/ChatPanel";
 import { ParticipantsPanel } from "@/components/room/ParticipantsPanel";
@@ -177,21 +176,25 @@ export default function MeetingRoom() {
         {/* Layout */}
 
         <div
-          className="
+          className={`
           absolute
           inset-0
           flex
           min-h-0
           min-w-0
-        "
+          transition-all
+          duration-300
+          ${(chatOpen || participantsOpen) ? "pr-[360px]" : ""}
+        `}
         >
-
           <MeetingLayoutManager
             layoutMode={layoutMode}
             participants={participants}
             selfParticipant={selfParticipant}
             activeSpeakerId={activeSpeakerId}
             pinnedParticipantId={pinnedParticipantId}
+            participantsOpen={participantsOpen}
+            chatOpen={chatOpen}
             onPinToggle={(participantId) =>
               setPinnedParticipant(
                 pinnedParticipantId === participantId

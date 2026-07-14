@@ -1,6 +1,6 @@
 import { GridLayout } from "./GridLayout";
+import PresentationLayout from "./PresentationLayout";
 import SpeakerLayout from "./SpeakerLayout";
-import { PresentationLayout } from "./PresentationLayout";
 
 import type { Participant } from "@/types";
 
@@ -15,7 +15,11 @@ interface Props {
 
     pinnedParticipantId: string | null;
 
-    onPinToggle: (participantId: string) => void;
+    participantsOpen: boolean;
+
+    chatOpen: boolean;
+
+    onPinToggle: (id: string) => void;
 }
 
 export default function MeetingLayoutManager({
@@ -24,11 +28,11 @@ export default function MeetingLayoutManager({
     selfParticipant,
     activeSpeakerId,
     pinnedParticipantId,
+    participantsOpen,
+    chatOpen,
     onPinToggle,
 }: Props) {
-
     switch (layoutMode) {
-
         case "speaker":
             return (
                 <SpeakerLayout
@@ -36,6 +40,8 @@ export default function MeetingLayoutManager({
                     selfParticipant={selfParticipant}
                     activeSpeakerId={activeSpeakerId}
                     pinnedId={pinnedParticipantId}
+                    participantsOpen={participantsOpen}
+                    chatOpen={chatOpen}
                     onPinToggle={onPinToggle}
                 />
             );
@@ -47,6 +53,8 @@ export default function MeetingLayoutManager({
                     selfParticipant={selfParticipant}
                     activeSpeakerId={activeSpeakerId}
                     pinnedId={pinnedParticipantId}
+                    participantsOpen={participantsOpen}
+                    chatOpen={chatOpen}
                     onPinToggle={onPinToggle}
                 />
             );
