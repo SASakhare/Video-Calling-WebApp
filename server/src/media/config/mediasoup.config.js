@@ -6,7 +6,7 @@ export const mediaConfig = {
 
         rtcMaxPort: 49999,
 
-        logLevel: "warn",
+        logLevel: "debug",
 
         logTags: [
 

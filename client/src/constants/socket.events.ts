@@ -29,6 +29,13 @@ export const CLIENT_EVENTS = {
     WEBRTC_ANSWER: "webrtc:answer",
     WEBRTC_ICE_CANDIDATE: "webrtc:ice-candidate",
 
+    // * WebRTC Connection :
+    MEDIA_CREATE_TRANSPORT:"media:createTransport",
+    MEDIA_CONNECT_TRANSPORT:"media:connectTransport",
+    MEDIA_PRODUCE:"media:produce",
+
+
+
     //* Media Controls
     PARTICIPANT_MIC: "participant:mic",
     PARTICIPANT_CAMERA: "participant:camera",
@@ -66,6 +73,11 @@ export const SERVER_EVENTS = {
     WEBRTC_OFFER: "webrtc:offer",
     WEBRTC_ANSWER: "webrtc:answer",
     WEBRTC_ICE_CANDIDATE: "webrtc:ice-candidate",
+
+    // * WebRTC Connection :
+    MEDIA_CREATED_TRANSPORT:"media:transportCreated",
+    MEDIA_ERROR:"media:error",
+
 
     //* Error
     ERROR: "error",

@@ -14,7 +14,12 @@ import cookieParser from "cookie-parser"
 import { initializeSocket, getIO } from "./socket/index.js"
 import { registerSocketEvents } from "./socket/register.js";
 
+// * media-soup
+import WorkerService from "./media/services/WorkerService.js"
+
+
 dotenv.config();
+WorkerService.initialize()
 
 
 

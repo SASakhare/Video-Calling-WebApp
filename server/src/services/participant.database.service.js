@@ -234,10 +234,6 @@ export const updateParticipantDB = async (participantId, data) => {
 
         console.log(participants);
 
-        // if (!participants) {
-        //     throw new CustomError("Error while  Participant Fetching", 503);
-        // }
-
         return participants;
 
     } catch (error) {

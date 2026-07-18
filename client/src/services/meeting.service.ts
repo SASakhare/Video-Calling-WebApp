@@ -371,16 +371,24 @@ export const meetingService = {
       // return response.data.meeting;
 
       // * connect to  socket sever 
-      socketService.connect();
+      await socketService.connect();
 
       // * now start meeting :
       socketService.emit(CLIENT_EVENTS.MEETING_START,
         {
           meetingId,
+          
           passcode
         }
       )
+      // const participantId = response.data.participant.participantId;
+      
+      // await socketService.emit("media:Room", {
+      //   meetingId,
+      //   passcode,
+      //   participantId,
 
+      // })
       if (response.data.success) {
         console.log(response.data);
 

@@ -20,7 +20,8 @@ class WorkerService {
             return this.worker;
 
         }
-
+    
+        // * it is creating the worker
         this.worker = await mediasoup.createWorker({
 
             rtcMinPort: mediaConfig.worker.rtcMinPort,
@@ -51,9 +52,9 @@ class WorkerService {
 
     }
 
-    // ===============================
-    // Get Worker
-    // ===============================
+    //^ ===============================
+    //^ Get Worker
+    //^ ===============================
 
     getWorker() {
 

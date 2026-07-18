@@ -7,16 +7,19 @@ class MediaParticipant {
     }) {
 
         this.participantId = participantId;
-
         this.userId = userId;
-
         this.socket = socket;
 
         // =====================================================
         // MediaSoup Resources
         // =====================================================
 
-        // transportId -> Transport
+        /*
+            transportId -> {
+                type: "send" | "recv",
+                transport
+            }
+        */
         this.transports = new Map();
 
         // producerId -> Producer
@@ -30,6 +33,28 @@ class MediaParticipant {
         // =====================================================
 
         this.joinedAt = new Date();
+
+    }
+
+    // =====================================================
+    // Basic Information
+    // =====================================================
+
+    getParticipantId() {
+
+        return this.participantId;
+
+    }
+
+    getUserId() {
+
+        return this.userId;
+
+    }
+
+    getJoinedAt() {
+
+        return this.joinedAt;
 
     }
 
@@ -53,24 +78,69 @@ class MediaParticipant {
     // Transport
     // =====================================================
 
-    addTransport(transport) {
+    addTransport(type, transport) {
 
         this.transports.set(
             transport.id,
-            transport
+            {
+                type,
+                transport,
+            }
         );
 
     }
 
     getTransport(id) {
 
-        return this.transports.get(id);
+        return this.transports.get(id)?.transport ?? null;
+
+    }
+
+    getTransportByType(type) {
+
+        for (const { type: transportType, transport } of this.transports.values()) {
+
+            if (transportType === type) {
+
+                return transport;
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    hasTransport(type) {
+
+        return this.getTransportByType(type) !== null;
 
     }
 
     removeTransport(id) {
 
         this.transports.delete(id);
+
+    }
+
+    removeTransportByType(type) {
+
+        for (const [id, value] of this.transports.entries()) {
+
+            if (value.type === type) {
+
+                value.transport.close();
+
+                this.transports.delete(id);
+
+                return true;
+
+            }
+
+        }
+
+        return false;
 
     }
 
@@ -95,16 +165,27 @@ class MediaParticipant {
 
     getProducer(id) {
 
-        return this.producers.get(id);
+        return this.producers.get(id) ?? null;
 
     }
 
     removeProducer(id) {
 
+        const producer =
+            this.producers.get(id);
+
+        if (!producer) {
+
+            return;
+
+        }
+
+        producer.close();
+
         this.producers.delete(id);
 
     }
-
+    
     getProducers() {
 
         return [...this.producers.values()];
@@ -126,7 +207,7 @@ class MediaParticipant {
 
     getConsumer(id) {
 
-        return this.consumers.get(id);
+        return this.consumers.get(id) ?? null;
 
     }
 
@@ -167,7 +248,7 @@ class MediaParticipant {
         this.consumers.clear();
 
         // Close Transports
-        for (const transport of this.transports.values()) {
+        for (const { transport } of this.transports.values()) {
 
             transport.close();
 

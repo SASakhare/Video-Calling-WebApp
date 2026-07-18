@@ -2,6 +2,8 @@ import { Socket } from "socket.io-client";
 
 import { registerMeetingHandlers } from "./handlers/meeting.handler";
 import { registerParticipantHandlers } from "./handlers/participant.handler";
+import {registerWebRTCHandlers} from "./handlers/webrtc.handler"
+
 
 export function registerSocketHandlers(socket: Socket) {
 
@@ -11,6 +13,6 @@ export function registerSocketHandlers(socket: Socket) {
 
     // registerChatHandlers(socket);
 
-    // registerWebRTCHandlers(socket);
+    registerWebRTCHandlers(socket);
 
 }

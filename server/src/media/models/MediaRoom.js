@@ -25,6 +25,9 @@ class MediaRoom {
             participant
         );
 
+        console.log("✅ media participant added");
+
+
     }
 
     removeParticipant(participantId) {

@@ -3,6 +3,8 @@ import { MicOff, Pin, Hand, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Participant } from "@/types";
+import { useEffect,useRef } from "react";
+
 
 interface ParticipantTileProps {
   participant: Participant;
@@ -24,6 +26,14 @@ export function ParticipantTile({
     .map((n) => n[0])
     .slice(0, 2)
     .join("");
+
+
+  const videoRef=useRef<HTMLVideoElement>(null);
+
+  useEffect(()=>{
+
+  },[participant.s])
+
 
   const connectionColors = {
     excellent: "bg-emerald-500",

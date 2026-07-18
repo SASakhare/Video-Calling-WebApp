@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { registerMeetingEvents } from "./events/meeting.events.js";
-
+import { registerMediaEvents } from "./events/webrtc.events.js"
 
 
 
@@ -15,6 +15,7 @@ export const registerSocketEvents = (io) => {
 
         // * registering Meeting Events
         registerMeetingEvents(io, socket);
+        registerMediaEvents(io, socket);
 
 
         // * 

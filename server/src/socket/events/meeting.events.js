@@ -17,7 +17,8 @@ import { createParticipantDB, getParticipantsDB, updateParticipantDB, getPartici
 import { CustomError } from "../../utils/customeError.js";
 import { CLIENT_EVENTS, SERVER_EVENTS } from "../constants/socket.events.js";
 import { v4 as uuid } from "uuid"
-
+import RoomService from "../../media/services/RoomService.js"
+import MediaParticipant from "../../media/models/MediaParticipant.js";
 
 export const registerMeetingEvents = (io, socket) => {
 
@@ -81,15 +82,15 @@ export const registerMeetingEvents = (io, socket) => {
 
             }
 
-            let existing = await getParticipantDB(userId, meetingId);
-            if (existing) {
-                existing = updateParticipantDB(existing.participantId, {
+            let participant = await getParticipantDB(userId, meetingId);
+            if (participant) {
+                participant = await updateParticipantDB(participant.participantId, {
                     status: 'JOINED',
                     joinedAt: new Date(),
                 })
             } else {
 
-                const participant = await createParticipantDB(userId, meetingId, participantData);
+                participant = await createParticipantDB(userId, meetingId, participantData);
             }
 
 
@@ -106,14 +107,36 @@ export const registerMeetingEvents = (io, socket) => {
             socket.data.roomId = roomId;
             socket.data.meetingId = meetingId;
             socket.data.hostId = meeting.hostId;
+            socket.data.participantId = participant.participantId
 
             console.log('Host Started Meeting :');
             console.log("Room Id :-", roomId);
 
 
+            // * ------------------ Media Room Meeting START ---------------------
+
+            const room = await RoomService.createRoom(meetingId);
+
+            // room.addParticipant(mediaParticipant);
+
+            RoomService.joinParticipant({
+                meetingId,
+                participantId:participant.participantId,
+                userId,
+                socket,
+            })
+
+            const routerRtpCapabilities = room.router.rtpCapabilities;
+
+
+            // * ------------------ Media Room Meeting END -----------------------
+
+
             socket.emit(SERVER_EVENTS.MEETING_STARTED, {
                 meetingId,
                 roomId,
+                participant,
+                routerRtpCapabilities,
             })
 
         } catch (error) {
@@ -269,7 +292,7 @@ export const registerMeetingEvents = (io, socket) => {
                     socket.emit(SERVER_EVENTS.PARTICIPANT_WAITING, {
                         message: "Wait Host Allow in Meeting",
                     })
-                    
+
                     const hostRoom =
                         `${meeting.hostId}:${meeting.meetingId}`;
 

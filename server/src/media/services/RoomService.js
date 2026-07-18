@@ -7,27 +7,29 @@ class RoomService {
 
     constructor() {
 
-        // meetingId -> MediaRoom
+        //* meetingId -> MediaRoom
         this.rooms = new Map();
 
-        // participantId -> meetingId
+        //* participantId -> meetingId
         this.participantRoomMap = new Map();
 
-        // socket.id -> participantId
+        //* socket.id -> participantId
         this.socketParticipantMap = new Map();
 
     }
 
-    // =====================================================
-    // Room Management
-    // =====================================================
+    //^ =====================================================
+    //^ Room Management
+    //^ =====================================================
 
     async createRoom(meetingId) {
+        
 
         if (this.rooms.has(meetingId)) {
             return this.rooms.get(meetingId);
         }
 
+        // * here we are creating the router per meeting
         const worker = WorkerService.getWorker();
 
         const router = await worker.createRouter({
@@ -36,6 +38,8 @@ class RoomService {
 
         });
 
+
+        // * mapping meeting to router using meetingId
         const room = new MediaRoom(meetingId, router);
 
         this.rooms.set(meetingId, room);
@@ -90,9 +94,9 @@ class RoomService {
 
     }
 
-    // =====================================================
-    // Participant Management
-    // =====================================================
+    //^ =====================================================
+    //^ Participant Management
+    //^ =====================================================
 
     joinParticipant({
 
@@ -116,8 +120,7 @@ class RoomService {
 
         let participant = room.getParticipant(participantId);
 
-        // Reconnection
-        // Reconnection
+        //* Reconnection
         if (participant) {
 
             const oldSocket = participant.getSocket();
@@ -179,6 +182,7 @@ class RoomService {
 
     }
 
+
     async leaveParticipant(socketId) {
 
         const participantId = this.socketParticipantMap.get(socketId);
@@ -219,9 +223,9 @@ class RoomService {
 
     }
 
-    // =====================================================
-    // Lookup
-    // =====================================================
+    //^ =====================================================
+    //^ Lookup
+    //^ =====================================================
 
     getParticipant(participantId) {
 
@@ -282,4 +286,4 @@ class RoomService {
 
 }
 
-export default new RoomService(); n
+export default new RoomService(); 

@@ -18,7 +18,7 @@ class SocketService {
 
     //* Connect to socket server
 
-    connect() {
+    async connect() {
 
         if (this.socket.connected) {
             console.log("Socket already connected");
@@ -52,7 +52,7 @@ class SocketService {
 
     // * Emit Event :
 
-    emit<T>(event: string, payload?: T) {
+    async emit<T>(event: string, payload?: T) {
 
         this.socket.emit(event, payload);
     }
@@ -62,7 +62,7 @@ class SocketService {
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    on<T>(event: string, callback?: (...args: any[]) => void) {
+    async on<T>(event: string, callback?: (...args: any[]) => void) {
 
         this.socket.on(event, callback);
     }
@@ -71,7 +71,7 @@ class SocketService {
     // * Remove lister
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    off<T>(event: string, callback?: (...args: any[]) => void) {
+    async off<T>(event: string, callback?: (...args: any[]) => void) {
 
         if (callback) {
             this.socket.off(event, callback)
