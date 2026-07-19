@@ -7,13 +7,15 @@ import TransportManager from "@/webrtc/transport/TransportManager";
 import LocalMediaManager from "@/webrtc/media/LocalMediaManager";
 
 
+
 export const registerMeetingHandlers = (socket: Socket) => {
 
     // * ----------------- Meeting Event ----------------
     socket.on(
         SERVER_EVENTS.MEETING_STARTED, async (data) => {
 
-            console.log('Meeting Started');
+
+            console.log('================================ Meeting Started ===================================');
 
             console.log(data);
 
@@ -28,6 +30,10 @@ export const registerMeetingHandlers = (socket: Socket) => {
             socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{
                 direction:"send",
             })
+
+            // socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{
+            //     direction:"recv",
+            // })
 
         }
     )

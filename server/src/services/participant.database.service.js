@@ -148,21 +148,52 @@ export const getParticipantsDB = async (userId, meetingId) => {
 
 }
 
-export const getParticipantDB = async (hostId,meetingId) => {
+export const getParticipantDB = async (meetingId, userId) => {
+    try {
+        const participant = await Participant.findOne({
+            meetingId,
+            userId,
+        });
+
+        return participant;
+    } catch (error) {
+        console.error("ERROR - Participants Fetching Failure:", error.message);
+
+        if (error instanceof CustomError || error.statusCode) {
+            throw error;
+        }
+
+        throw new CustomError("Error while Participants Fetching", 503);
+    }
+};
+
+
+export const getParticipantByParticipantIdDB = async (participantId) => {
 
     try {
 
-        const participant = await Participant.findOne({ hostId,meetingId });
+        console.log("Inside get participant :");
+        console.log(`participant ID :${participantId}`);
 
-        // if (!participants) {
-        //     throw new CustomError("Error while  Participants Fetching", 503);
-        // }
+
+        const participant = await Participant.findOne({ participantId });
+
+        console.log("Inside get participant :");
+        console.log('participant');
+        console.log(participant);
+
+
+        if (!participant) {
+            throw new CustomError("Error while  Participants Fetching", 503);
+        }
+        console.log("Inside get participant :");
+        console.log('returning participant');
 
         return participant;
 
     } catch (error) {
 
-        console.error("ERROR -Participants Fetching Failure:", error.message);
+        console.error("ERROR -Participants Fetching bb ParticipantId  Failure:", error.message);
 
         if (error instanceof CustomError || error.statusCode) {
             throw error;

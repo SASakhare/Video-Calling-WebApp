@@ -26,7 +26,7 @@ export const registerMeetingEvents = (io, socket) => {
 
     socket.on(CLIENT_EVENTS.MEETING_START, async (payload) => {
 
-        console.log("Meeting Start");
+        console.log("===================================== Meeting Start ======================================");
         try {
 
             // const 
@@ -121,7 +121,7 @@ export const registerMeetingEvents = (io, socket) => {
 
             RoomService.joinParticipant({
                 meetingId,
-                participantId:participant.participantId,
+                participantId: participant.participantId,
                 userId,
                 socket,
             })
@@ -242,7 +242,7 @@ export const registerMeetingEvents = (io, socket) => {
 
             }
 
-            let participant = await getParticipantDB(meeting.hostId, meetingId);
+            let participant = await getParticipantDB(meetingId, userId);
             console.log(participant);
 
 
@@ -332,15 +332,84 @@ export const registerMeetingEvents = (io, socket) => {
             //     meetingId,
             //     roomId,
             // })
+
             console.log(`${userId}-joined-room-${roomId}`);
 
-            io.to(roomId).emit(
-                SERVER_EVENTS.PARTICIPANT_JOINED,
-                {
-                    message: "participant Joined",
-                    participant
-                }
-            )
+
+            // * ------------------ Media Room Meeting START ---------------------
+
+
+            // room.addParticipant(mediaParticipant);
+
+            const mediaParticipant = RoomService.joinParticipant({
+                meetingId,
+                participantId: participant.participantId,
+                userId,
+                socket,
+            })
+
+
+            const routerRtpCapabilities = RoomService.getRoom(meetingId).getRouterRtpCapabilities()
+
+            // * ------------------ Media Room Meeting END -----------------------
+
+
+            socket.emit(SERVER_EVENTS.MEETING_STARTED, {
+                meetingId,
+                roomId,
+                participant,
+                routerRtpCapabilities,
+            })
+
+            // io.to(roomId).emit(
+            //     SERVER_EVENTS.PARTICIPANT_JOINED,
+            //     {
+            //         message: "participant Joined",
+            //         participant
+            //     }
+            // )
+
+
+            // * --------------------------------
+            // const roomWebRtc = RoomService.getRoom(meetingId);
+
+            // if (!roomWebRtc) {
+            //     throw new Error("Room not found");
+            // }
+
+            // const participants = [];
+            // const producers = [];
+
+            // for (const participant of roomWebRtc.getParticipants()) {
+
+            //     participants.push({
+            //         participantId: participant.getParticipantId(),
+            //         userId: participant.getUserId(),
+            //         joinedAt: participant.joinedAt,
+            //     });
+
+            //     for (const producer of participant.getProducers()) {
+            //         console.log(producer);
+            //         producers.push({
+            //             producerId: producer.id,
+            //             participantId: participant.getParticipantId(),
+            //             kind: producer.kind,
+            //             appData: producer.appData,
+            //         });
+
+            //     }
+            // }
+            // console.log("SERVER_EVENTS.MEETING_SYNC");
+            // console.log('Participant :\n', participants);
+            // console.log("producers :\n", producers);
+
+
+
+            // socket.emit(SERVER_EVENTS.MEETING_SYNC, {
+            //     meetingId: roomWebRtc.getMeetingId(),
+            //     participants,
+            //     producers,
+            // });
 
         } catch (error) {
             console.error("ERROR - Meeting Join Failure:", error.message);

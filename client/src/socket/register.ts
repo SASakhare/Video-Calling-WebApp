@@ -11,8 +11,6 @@ export function registerSocketHandlers(socket: Socket) {
 
     registerParticipantHandlers(socket);
 
-    // registerChatHandlers(socket);
-
     registerWebRTCHandlers(socket);
 
 }

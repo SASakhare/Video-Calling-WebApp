@@ -1,5 +1,7 @@
 import RoomService from "./RoomService.js";
 import { mediaConfig } from "../config/mediasoup.config.js";
+import { getParticipantByParticipantIdDB } from "../../services/participant.database.service.js"
+import { SERVER_EVENTS } from "../../socket/constants/socket.events.js";
 
 
 class MediaService {
@@ -20,6 +22,10 @@ class MediaService {
                 participantId
             );
 
+        console.log("========================= Media Service =======================");
+        console.log(participant);
+
+
 
         if (!participant) {
 
@@ -36,6 +42,9 @@ class MediaService {
                 participantId
             );
 
+        console.log("room :", room);
+
+
 
         if (!room) {
 
@@ -51,6 +60,8 @@ class MediaService {
             room.getRouter();
 
 
+        console.log("Router :", router);
+
 
         const transport =
             await router.createWebRtcTransport({
@@ -59,6 +70,8 @@ class MediaService {
 
             });
 
+
+        console.log('transport :', transport);
 
 
         // IMPORTANT
@@ -69,7 +82,21 @@ class MediaService {
             transport
         );
 
+        console.log("participant added");
 
+
+        const participantData = getParticipantByParticipantIdDB(participantId)
+
+        console.log("participant added");
+        // const roomId = `${participantData.hostId}:${participantData.meetingId}`
+
+
+        // participant.socket.to(roomId).emit(SERVER_EVENTS.NEW_PRODUCER, {
+        //     producerId,
+        //     participant,
+        //     kind,
+        //     appData,
+        // })
 
         console.log(
             `✅ ${direction} Transport Created : ${transport.id}`
@@ -176,6 +203,8 @@ class MediaService {
             producer
         );
 
+
+
         console.log(
             `✅ Producer Created : ${producer.id}`
         );
@@ -203,6 +232,68 @@ class MediaService {
         );
 
         return producer;
+
+    }
+
+    async createConsumer(
+        participantId,
+        producerId,
+        rtpCapabilities
+    ) {
+
+
+        const room = RoomService.getRoomByParticipant(participantId);
+
+        if (!room) {
+            throw new Error("Room not found");
+        }
+
+        const participant = room.getParticipant(participantId);
+
+
+        if (!participant) {
+            throw new Error("Participant not found");
+        }
+
+        const recvTransport = participant.getTransportByType("recv");
+
+
+        if (!recvTransport) {
+            throw new Error("Receive transport not found");
+        }
+
+        const router = room.getRouter();
+
+        const canConsume = router.canConsume({
+            producerId,
+            rtpCapabilities,
+        })
+
+        if (!canConsume) {
+            throw new Error(
+                "Client cannot consume this producer"
+            )
+        }
+
+        const consumer = await recvTransport.consume({
+            producerId,
+            rtpCapabilities,
+            paused: false,
+        });
+
+        participant.addConsumer(consumer);
+
+        return {
+            id: consumer.id,
+            producerId: consumer.producerId,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters,
+            types: consumer.types,
+            producerPaused: consumer.producerPaused,
+            appData: consumer.appData
+        };
+
+
 
     }
 

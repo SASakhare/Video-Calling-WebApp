@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Meeting, Participant, ChatMessage } from "@/types";
+import type { Meeting, Participant, ChatMessage, ProducerInfo } from "@/types";
 import { persist } from "zustand/middleware";
 
 interface Reaction {
@@ -38,6 +38,24 @@ interface MeetingState {
   pinParticipant: (participantId: string | null) => void;
 
   unpinParticipant: () => void;
+
+  // * -------------------- Meeting Sync --------------------
+
+  meetingId: string | null;
+
+  producers: ProducerInfo[];
+
+  setMeetingSync: (payload: {
+    meetingId: string;
+    participants: Participant[];
+    producers: ProducerInfo[];
+  }) => void;
+
+  setProducers: (producers: ProducerInfo[]) => void;
+
+  addProducer: (producer: ProducerInfo) => void;
+
+  removeProducer: (producerId: string) => void;
 
   // * -------------------- Live Meeting --------------------------------
   micOn: boolean;
@@ -89,6 +107,8 @@ export const useMeetingStore = create<MeetingState>()(
       },
       clearCurrentMeeting: () => {
         set({
+          meetingId: null,
+          producers: [],
           currentMeeting: null,
         })
       },
@@ -128,6 +148,38 @@ export const useMeetingStore = create<MeetingState>()(
         set({
           pinnedParticipantId: null,
         }),
+
+      meetingId: null,
+
+      producers: [],
+
+      setMeetingSync: ({
+        meetingId,
+        participants,
+        producers,
+      }) =>
+        set({
+          meetingId,
+          participants,
+          producers,
+        }),
+
+      setProducers: (producers) =>
+        set({
+          producers,
+        }),
+
+      addProducer: (producer) =>
+        set((state) => ({
+          producers: [...state.producers, producer],
+        })),
+
+      removeProducer: (producerId) =>
+        set((state) => ({
+          producers: state.producers.filter(
+            (p) => p.producerId !== producerId
+          ),
+        })),
 
       micOn: true,
       cameraOn: true,

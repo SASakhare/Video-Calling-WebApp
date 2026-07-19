@@ -95,3 +95,12 @@ export interface Notification {
   read: boolean;
   href?: string;
 }
+
+
+
+export interface ProducerInfo {
+  producerId: string;
+  participantId: string;
+  kind: "audio" | "video";
+  appData?: Record<string, unknown>;
+}

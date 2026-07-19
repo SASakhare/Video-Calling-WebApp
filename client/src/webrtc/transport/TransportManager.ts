@@ -180,6 +180,41 @@ class TransportManager {
             "✅ Receive Transport Created"
         );
 
+        // * this only register the event ,not going to fire
+        this.recvTransport.on(
+            "connect",
+            async (
+                { dtlsParameters },
+                callback,
+                errback
+
+            ) => {
+
+                try {
+                    this.socket.emit(
+                        CLIENT_EVENTS.MEDIA_CONNECT_TRANSPORT,
+                        {
+                            direction: "recv",
+                            dtlsParameters
+                        },
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (response: any) => {
+                            if (!response.success) {
+
+                                return errback(
+                                    new Error(response.message)
+                                );
+                            }
+                            callback();
+                        }
+                    )
+
+                } catch (error) {
+                    errback(error as Error)
+                }
+
+            }
+        )
 
         return this.recvTransport;
 

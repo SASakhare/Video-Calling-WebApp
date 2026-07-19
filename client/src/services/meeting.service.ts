@@ -283,6 +283,8 @@ export const meetingService = {
       const response = await axios.get(`${API_END_POINT}/${id}/passcode/${passcode}`);
 
       const state = useMeetingStore.getState();
+      console.log(response);
+      
       if (response.data.success) {
         state.setCurrentMeeting(response.data.meeting)
         toast.success(response.data.message);
@@ -397,9 +399,9 @@ export const meetingService = {
 
     } catch (error) {
 
-      socketService.disconnect();
       console.log(error.response.data.message);
-      toast.error(error.response.data.message);
+      socketService.disconnect();
+      // toast.error(error.response.data.message);
       throw error;
     }
   },
