@@ -119,7 +119,7 @@ export const registerMeetingEvents = (io, socket) => {
 
             // room.addParticipant(mediaParticipant);
 
-            RoomService.joinParticipant({
+            await RoomService.joinParticipant({
                 meetingId,
                 participantId: participant.participantId,
                 userId,
@@ -341,7 +341,7 @@ export const registerMeetingEvents = (io, socket) => {
 
             // room.addParticipant(mediaParticipant);
 
-            const mediaParticipant = RoomService.joinParticipant({
+            const mediaParticipant =await RoomService.joinParticipant({
                 meetingId,
                 participantId: participant.participantId,
                 userId,
@@ -361,55 +361,6 @@ export const registerMeetingEvents = (io, socket) => {
                 routerRtpCapabilities,
             })
 
-            // io.to(roomId).emit(
-            //     SERVER_EVENTS.PARTICIPANT_JOINED,
-            //     {
-            //         message: "participant Joined",
-            //         participant
-            //     }
-            // )
-
-
-            // * --------------------------------
-            // const roomWebRtc = RoomService.getRoom(meetingId);
-
-            // if (!roomWebRtc) {
-            //     throw new Error("Room not found");
-            // }
-
-            // const participants = [];
-            // const producers = [];
-
-            // for (const participant of roomWebRtc.getParticipants()) {
-
-            //     participants.push({
-            //         participantId: participant.getParticipantId(),
-            //         userId: participant.getUserId(),
-            //         joinedAt: participant.joinedAt,
-            //     });
-
-            //     for (const producer of participant.getProducers()) {
-            //         console.log(producer);
-            //         producers.push({
-            //             producerId: producer.id,
-            //             participantId: participant.getParticipantId(),
-            //             kind: producer.kind,
-            //             appData: producer.appData,
-            //         });
-
-            //     }
-            // }
-            // console.log("SERVER_EVENTS.MEETING_SYNC");
-            // console.log('Participant :\n', participants);
-            // console.log("producers :\n", producers);
-
-
-
-            // socket.emit(SERVER_EVENTS.MEETING_SYNC, {
-            //     meetingId: roomWebRtc.getMeetingId(),
-            //     participants,
-            //     producers,
-            // });
 
         } catch (error) {
             console.error("ERROR - Meeting Join Failure:", error.message);

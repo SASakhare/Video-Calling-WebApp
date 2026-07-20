@@ -67,17 +67,20 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
 
     socket.on(SERVER_EVENTS.MEETING_SYNC, async (data) => {
 
-        // console.log("Meeting Sync :", data);
+        console.log("Meeting Sync :", data);
 
-        const state = useMeetingStore.getState();
+        // const state = useMeetingStore.getState();
 
-        state.setMeetingSync(data)
+        // state.setMeetingSync(data)
+        useMeetingStore.getState().setMeetingParticipants(data.participants);
 
     })
 
 
 
 }
+
+
 
 
 

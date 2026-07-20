@@ -97,10 +97,54 @@ export interface Notification {
 }
 
 
+// ======================================================
+// Producer
+// ======================================================
 
-export interface ProducerInfo {
+export interface ParticipantProducer {
   producerId: string;
-  participantId: string;
   kind: "audio" | "video";
   appData?: Record<string, unknown>;
+}
+
+// ======================================================
+// Presence
+// ======================================================
+
+export interface ParticipantPresence {
+  connectionState: "CONNECTED" | "RECONNECTING" | "DISCONNECTED";
+
+  isMicOn: boolean;
+  isCameraOn: boolean;
+  isScreenSharing: boolean;
+  isHandRaised: boolean;
+  isRecording: boolean;
+  isSpeaking: boolean;
+}
+
+// ======================================================
+// Participant
+// ======================================================
+
+export interface MeetingParticipant
+  extends ParticipantPresence {
+
+  // Identity
+  participantId: string;
+  userId: string;
+
+  username: string;
+  fullName: string;
+  email: string;
+  avatar: string | null;
+
+  // Meeting
+  meetingId: string;
+  hostId: string;
+  role: "HOST" | "PARTICIPANT";
+
+  joinedAt: string;
+
+  // Media
+  producers: ParticipantProducer[];
 }

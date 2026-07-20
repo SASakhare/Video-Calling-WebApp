@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import type { Meeting, Participant, ChatMessage, ProducerInfo } from "@/types";
+import type { Meeting, Participant, ChatMessage, MeetingParticipant } from "@/types";
 import { persist } from "zustand/middleware";
+import { easeIn } from "framer-motion";
 
 interface Reaction {
   id: string;
@@ -41,21 +42,33 @@ interface MeetingState {
 
   // * -------------------- Meeting Sync --------------------
 
-  meetingId: string | null;
+  meetingParticipants: MeetingParticipant[];
 
-  producers: ProducerInfo[];
+  setMeetingParticipants: (
+    participants: MeetingParticipant[]
+  ) => void;
 
-  setMeetingSync: (payload: {
-    meetingId: string;
-    participants: Participant[];
-    producers: ProducerInfo[];
-  }) => void;
+  addMeetingParticipant: (
+    participant: MeetingParticipant
+  ) => void;
 
-  setProducers: (producers: ProducerInfo[]) => void;
+  addMeetingParticipants: (
+    participants: MeetingParticipant[]
+  ) => void;
 
-  addProducer: (producer: ProducerInfo) => void;
+  updateMeetingParticipant: (
+    participant: MeetingParticipant
+  ) => void;
 
-  removeProducer: (producerId: string) => void;
+  removeMeetingParticipant: (
+    participantId: string
+  ) => void;
+
+  clearMeetingParticipants: () => void;
+
+  getMeetingParticipant: (
+    participantId: string
+  ) => MeetingParticipant | undefined;
 
   // * -------------------- Live Meeting --------------------------------
   micOn: boolean;
@@ -107,8 +120,6 @@ export const useMeetingStore = create<MeetingState>()(
       },
       clearCurrentMeeting: () => {
         set({
-          meetingId: null,
-          producers: [],
           currentMeeting: null,
         })
       },
@@ -149,38 +160,97 @@ export const useMeetingStore = create<MeetingState>()(
           pinnedParticipantId: null,
         }),
 
-      meetingId: null,
-
-      producers: [],
-
-      setMeetingSync: ({
-        meetingId,
-        participants,
-        producers,
-      }) =>
+      // *=============================== Meeting Participant Sync ==========================================
+      meetingParticipants: [],
+      setMeetingParticipants: (meetingParticipants) =>
         set({
-          meetingId,
-          participants,
-          producers,
+          meetingParticipants,
         }),
 
-      setProducers: (producers) =>
-        set({
-          producers,
+      addMeetingParticipant: (participant) =>
+        set((state) => {
+
+          const exists = state.meetingParticipants.some(
+            (p) => p.participantId === participant.participantId
+          );
+
+          if (exists) {
+            console.log("exist :");
+            console.log(exists);
+            
+            
+            return state;
+          }
+
+          return {
+            meetingParticipants: [
+              ...state.meetingParticipants,
+              participant,
+            ],
+          };
+
         }),
 
-      addProducer: (producer) =>
-        set((state) => ({
-          producers: [...state.producers, producer],
-        })),
+      addMeetingParticipants: (participants) =>
+        set((state) => {
 
-      removeProducer: (producerId) =>
+          const existingIds = new Set(
+            state.meetingParticipants.map(
+              (p) => p.participantId
+            )
+          );
+
+          const newParticipants = participants.filter(
+            (participant) =>
+              !existingIds.has(participant.participantId)
+          );
+
+          return {
+            meetingParticipants: [
+              ...state.meetingParticipants,
+              ...newParticipants,
+            ],
+          };
+
+        }),
+
+      updateMeetingParticipant: (participant) =>
         set((state) => ({
-          producers: state.producers.filter(
-            (p) => p.producerId !== producerId
+          meetingParticipants: state.meetingParticipants.map(
+            (p) =>
+              p.participantId === participant.participantId
+                ? participant
+                : p
           ),
         })),
 
+      removeMeetingParticipant: (participantId) =>
+        set((state) => ({
+          meetingParticipants:
+            state.meetingParticipants.filter(
+              (participant) =>
+                participant.participantId !== participantId
+            ),
+        })),
+
+      clearMeetingParticipants: () =>
+        set({
+          meetingParticipants: [],
+        }),
+
+      getMeetingParticipant: (participantId) => {
+
+        return useMeetingStore
+          .getState()
+          .meetingParticipants
+          .find(
+            (participant) =>
+              participant.participantId === participantId
+          );
+
+      },
+
+      // *=========================================================================
       micOn: true,
       cameraOn: true,
       screenSharing: false,

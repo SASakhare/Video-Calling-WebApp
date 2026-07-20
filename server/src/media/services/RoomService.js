@@ -2,6 +2,9 @@ import WorkerService from "./WorkerService.js";
 import MediaRoom from "../models/MediaRoom.js";
 import MediaParticipant from "../models/MediaParticipant.js";
 import { mediaConfig } from "../config/mediasoup.config.js";
+import { getUserByUserId } from "../../services/user.database.service.js"
+import { getMeetingByMeetingIdDB } from "../../services/meeting.database.service.js"
+
 
 class RoomService {
 
@@ -23,7 +26,7 @@ class RoomService {
     //^ =====================================================
 
     async createRoom(meetingId) {
-        
+
 
         if (this.rooms.has(meetingId)) {
             return this.rooms.get(meetingId);
@@ -98,7 +101,7 @@ class RoomService {
     //^ Participant Management
     //^ =====================================================
 
-    joinParticipant({
+    async joinParticipant({
 
         meetingId,
 
@@ -109,6 +112,9 @@ class RoomService {
         socket,
 
     }) {
+
+        console.log("============================== Join Participant ===============================");
+
 
         const room = this.rooms.get(meetingId);
 
@@ -121,6 +127,7 @@ class RoomService {
         let participant = room.getParticipant(participantId);
 
         //* Reconnection
+
         if (participant) {
 
             const oldSocket = participant.getSocket();
@@ -146,15 +153,37 @@ class RoomService {
 
         }
 
+        // * fetch data from userId  and make the MediaParticipant
+
+        const participantData = await getUserByUserId(userId);
+
+        const meeting = await getMeetingByMeetingIdDB(meetingId);
+
+        const hostId = meeting.hostId;
+        const username = participantData.username
+        const fullName = `${participantData.firstName} ${participantData.lastName}`
+        const avatar = participantData.avatarUrl;
+        const role = participantData.role;
+
+
         participant = new MediaParticipant({
 
             participantId,
+            meetingId,
+            hostId,
 
             userId,
+            username,
+            fullName,
+            avatar,
+
+            role,
 
             socket,
-
         });
+
+        console.log("============================== Saving in Room ===============================");
+
 
         room.addParticipant(participant);
 

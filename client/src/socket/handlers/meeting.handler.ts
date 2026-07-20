@@ -27,8 +27,10 @@ export const registerMeetingHandlers = (socket: Socket) => {
 
             await LocalMediaManager.initialize();
 
-            socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{
-                direction:"send",
+            console.log("MEDIA_CREATE_TRANSPORT event fire");
+
+            socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT, {
+                direction: "send",
             })
 
             // socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{

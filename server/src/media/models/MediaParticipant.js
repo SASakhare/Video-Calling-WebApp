@@ -1,13 +1,58 @@
 class MediaParticipant {
 
     constructor({
-        participantId,
-        userId,
-        socket,
+        participantId,// *
+        meetingId,
+        hostId,
+
+        userId, // *
+        username,
+        fullName,
+        avatar,
+
+        role,
+
+        socket, // *
     }) {
+
+        // =====================================================
+        // Identity
+        // =====================================================
 
         this.participantId = participantId;
         this.userId = userId;
+
+        this.username = username;
+        this.fullName = fullName;
+        this.avatar = avatar ?? null;
+
+        // =====================================================
+        // Meeting
+        // =====================================================
+
+        this.meetingId = meetingId;
+        this.hostId = hostId;
+        this.role = role;
+
+        this.joinedAt = new Date();
+
+        // =====================================================
+        // Presence State
+        // =====================================================
+
+        this.connectionState = "CONNECTED";
+
+        this.isMicOn = true;
+        this.isCameraOn = true;
+        this.isScreenSharing = false;
+        this.isHandRaised = false;
+        this.isRecording = false;
+        this.isSpeaking = false;
+
+        // =====================================================
+        // Socket
+        // =====================================================
+
         this.socket = socket;
 
         // =====================================================
@@ -15,11 +60,13 @@ class MediaParticipant {
         // =====================================================
 
         /*
-            transportId -> {
-                type: "send" | "recv",
+            transportId ->
+            {
+                type:"send" | "recv",
                 transport
             }
         */
+
         this.transports = new Map();
 
         // producerId -> Producer
@@ -28,34 +75,78 @@ class MediaParticipant {
         // consumerId -> Consumer
         this.consumers = new Map();
 
-        // =====================================================
-        // Participant State
-        // =====================================================
-
-        this.joinedAt = new Date();
-
     }
 
     // =====================================================
-    // Basic Information
+    // Identity
     // =====================================================
 
     getParticipantId() {
-
         return this.participantId;
+    }
 
+    getMeetingId() {
+        return this.meetingId;
+    }
+
+    getHostId() {
+        return this.hostId;
     }
 
     getUserId() {
-
         return this.userId;
+    }
 
+    getUsername() {
+        return this.username;
+    }
+
+    getFullName() {
+        return this.fullName;
+    }
+
+    getAvatar() {
+        return this.avatar;
+    }
+
+    getRole() {
+        return this.role;
     }
 
     getJoinedAt() {
-
         return this.joinedAt;
+    }
 
+    // =====================================================
+    // Presence
+    // =====================================================
+
+    setMic(state) {
+        this.isMicOn = state;
+    }
+
+    setCamera(state) {
+        this.isCameraOn = state;
+    }
+
+    setScreenSharing(state) {
+        this.isScreenSharing = state;
+    }
+
+    setHandRaised(state) {
+        this.isHandRaised = state;
+    }
+
+    setRecording(state) {
+        this.isRecording = state;
+    }
+
+    setSpeaking(state) {
+        this.isSpeaking = state;
+    }
+
+    setConnectionState(state) {
+        this.connectionState = state;
     }
 
     // =====================================================
@@ -63,15 +154,11 @@ class MediaParticipant {
     // =====================================================
 
     updateSocket(socket) {
-
         this.socket = socket;
-
     }
 
     getSocket() {
-
         return this.socket;
-
     }
 
     // =====================================================
@@ -112,13 +199,13 @@ class MediaParticipant {
 
     }
 
-    hasTransport(type) {
-
-        return this.getTransportByType(type) !== null;
-
-    }
-
     removeTransport(id) {
+
+        const transport = this.transports.get(id);
+
+        if (!transport) return;
+
+        transport.transport.close();
 
         this.transports.delete(id);
 
@@ -171,21 +258,16 @@ class MediaParticipant {
 
     removeProducer(id) {
 
-        const producer =
-            this.producers.get(id);
+        const producer = this.producers.get(id);
 
-        if (!producer) {
-
-            return;
-
-        }
+        if (!producer) return;
 
         producer.close();
 
         this.producers.delete(id);
 
     }
-    
+
     getProducers() {
 
         return [...this.producers.values()];
@@ -213,6 +295,12 @@ class MediaParticipant {
 
     removeConsumer(id) {
 
+        const consumer = this.consumers.get(id);
+
+        if (!consumer) return;
+
+        consumer.close();
+
         this.consumers.delete(id);
 
     }
@@ -224,37 +312,79 @@ class MediaParticipant {
     }
 
     // =====================================================
+    // DTO
+    // =====================================================
+
+    toDTO() {
+
+        return {
+
+            participantId: this.participantId,
+
+            meetingId: this.meetingId,
+
+            hostId: this.hostId,
+
+            userId: this.userId,
+
+            username: this.username,
+
+            fullName: this.fullName,
+
+            avatar: this.avatar,
+
+            role: this.role,
+
+            joinedAt: this.joinedAt,
+
+            connectionState: this.connectionState,
+
+            isMicOn: this.isMicOn,
+
+            isCameraOn: this.isCameraOn,
+
+            isScreenSharing: this.isScreenSharing,
+
+            isHandRaised: this.isHandRaised,
+
+            isRecording: this.isRecording,
+
+            isSpeaking: this.isSpeaking,
+
+            producers: this.getProducers().map((producer) => ({
+                producerId: producer.id,
+                kind: producer.kind,
+                appData: producer.appData,
+            })),
+        };
+
+    }
+
+    // =====================================================
     // Cleanup
     // =====================================================
 
     async close() {
 
-        // Close Producers
         for (const producer of this.producers.values()) {
-
             producer.close();
-
         }
 
         this.producers.clear();
 
-        // Close Consumers
         for (const consumer of this.consumers.values()) {
-
             consumer.close();
-
         }
 
         this.consumers.clear();
 
-        // Close Transports
         for (const { transport } of this.transports.values()) {
-
             transport.close();
-
         }
 
         this.transports.clear();
+
+        this.connectionState = "DISCONNECTED";
 
     }
 

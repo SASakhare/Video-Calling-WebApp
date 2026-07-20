@@ -13,6 +13,8 @@ export const registerParticipantHandlers = (socket: Socket) => {
             console.log('PARTICIPANT_JOINED');
 
             console.log(data);
+            useMeetingStore.getState().addMeetingParticipant(data);
+            // useMeetingStore.getState().setProducers(data)
 
         }
     )
