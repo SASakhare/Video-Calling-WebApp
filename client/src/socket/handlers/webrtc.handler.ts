@@ -5,7 +5,9 @@ import { socket } from "@/lib/socket";
 import TransportManager from "@/webrtc/transport/TransportManager";
 import ProducerManager from "@/webrtc/producer/ProducerManager";
 import LocalMediaManager from "@/webrtc/media/LocalMediaManager";
-
+import MediaManager from "@/webrtc/core/MediaManager";
+import { useAuthStore } from "@/store/auth.store";
+import ConsumerManager from "@/webrtc/consumer/ConsumerManager";
 
 export const registerWebRTCHandlers = async (socket: Socket) => {
 
@@ -21,6 +23,7 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
         console.log(track?.enabled);
 
         if (data.direction == 'send') {
+
             TransportManager.createSendTransport({
                 id: data.id,
                 iceParameters: data.iceParameters,
@@ -48,17 +51,16 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
                 direction: "send"
             })
 
+
+
         } else if (data.direction == 'recv') {
+
             TransportManager.createRecvTransport({
                 id: data.id,
                 iceParameters: data.iceParameters,
                 iceCandidates: data.iceCandidates,
                 dtlsParameters: data.dtlsParameters,
             });
-
-            socket.emit(CLIENT_EVENTS.MEDIA_PRODUCING, {
-                direction: "recv"
-            })
 
         }
 
@@ -81,8 +83,62 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
         useMeetingStore.getState().setMeetingParticipants(data.participants);
 
         //* * here we make the event file for all participant producer consume except myself.
-        
 
+        console.log("Meeting Sync End-1");
+
+        console.log(TransportManager.getRecvTransport());
+
+        console.log("Meeting Sync End-2");
+
+
+        // for (const participant of data.participants) {
+
+        //     console.log("Before Loop ");
+
+        //     if (participant.userId != useAuthStore.getState().user.userId) {
+
+        //         console.log(participant);
+        //         console.log("emitting the ");
+        //         // socket.emit(CLIENT_EVENTS.MEDIA_CONSUME, {
+        //         //     producerId: participant.producer[0].producerId,
+        //         //     rtpCapabilities: MediaManager.getDevice().rtpCapabilities
+        //         // })
+
+        //         // console.log(participant.producers);
+
+        //         for (const producer of participant.producers) {
+        //             console.log("producerId :");
+
+        //             console.log(producer.producerId);
+
+
+        //             console.log("rtpCapabilities :");
+        //             console.log(MediaManager.getDevice().rtpCapabilities);
+
+
+        //             socket.emit(CLIENT_EVENTS.MEDIA_CONSUME, {
+        //                 producerId: producer.producerId,
+        //                 rtpCapabilities: MediaManager.getDevice().rtpCapabilities
+        //             },
+        //                 (response) => {
+        //                     console.log(response);
+        //                 }
+        //             )
+
+        //         }
+
+
+        //     }
+        //     console.log("After Loop ");
+        // }
+
+        // ConsumerManager.
+
+        console.log("Meeting Consuming Started");
+        
+        await ConsumerManager.consumeMeeting(data.participants);
+        
+        console.log("Meeting Consuming Ended");
     })
 
 

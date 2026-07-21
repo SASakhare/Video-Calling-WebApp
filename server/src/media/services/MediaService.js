@@ -281,14 +281,49 @@ class MediaService {
             paused: false,
         });
 
+
+
+        consumer.on(
+            "transportclose",
+            () => {
+
+                participant.removeConsumer(
+                    consumer.id
+                );
+
+            }
+        );
+
+        consumer.on(
+            "producerclose",
+            () => {
+
+                participant.removeConsumer(
+                    consumer.id
+                );
+
+            }
+        );
+
+        consumer.on(
+            "close",
+            () => {
+
+                participant.removeConsumer(
+                    consumer.id
+                );
+
+            }
+        );
+
         participant.addConsumer(consumer);
+
 
         return {
             id: consumer.id,
             producerId: consumer.producerId,
             kind: consumer.kind,
             rtpParameters: consumer.rtpParameters,
-            types: consumer.types,
             producerPaused: consumer.producerPaused,
             appData: consumer.appData
         };

@@ -1,3 +1,5 @@
+import { RtpParameters } from "mediasoup-client/types";
+
 export type ID = string;
 
 export interface User {
@@ -65,7 +67,7 @@ export interface Meeting {
 
   waitingRoomEnabled: boolean;
 
-  recordingEnabled?: boolean;
+  recordingEnabled?: boolean
 }
 
 export interface ChatMessage {
@@ -147,4 +149,27 @@ export interface MeetingParticipant
 
   // Media
   producers: ParticipantProducer[];
+}
+
+
+export interface ConsumeOptions {
+
+  participantId: string;
+
+  producerId: string;
+
+  id: string;
+
+  kind: "audio" | "video";
+
+  rtpParameters: RtpParameters;
+
+  appData?: Record<string, unknown>;
+
+}
+
+
+export interface ConsumeResponse {
+  success: boolean;
+  consumer: ConsumeOptions;
 }
