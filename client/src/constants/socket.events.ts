@@ -34,6 +34,7 @@ export const CLIENT_EVENTS = {
     MEDIA_CONNECT_TRANSPORT:"media:connectTransport",
     MEDIA_PRODUCE:"media:produce",
     MEDIA_PRODUCING:"media:producing",
+    MEDIA_CONSUME:"media:consume",
 
     // * 
 
@@ -79,6 +80,8 @@ export const SERVER_EVENTS = {
     // * WebRTC Connection :
     MEDIA_CREATED_TRANSPORT:"media:transportCreated",
     MEDIA_ERROR:"media:error",
+    MEDIA_CONSUMED:"media:consumed",
+
     
     // * Producer Server Event
     NEW_PRODUCER:"media:new_producer",

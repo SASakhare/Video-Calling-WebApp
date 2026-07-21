@@ -33,9 +33,9 @@ export const registerMeetingHandlers = (socket: Socket) => {
                 direction: "send",
             })
 
-            // socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{
-            //     direction:"recv",
-            // })
+            socket.emit(CLIENT_EVENTS.MEDIA_CREATE_TRANSPORT,{
+                direction:"recv",
+            })
 
         }
     )

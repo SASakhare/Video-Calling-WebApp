@@ -43,6 +43,11 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
                 }
             );
 
+
+            socket.emit(CLIENT_EVENTS.MEDIA_PRODUCING, {
+                direction: "send"
+            })
+
         } else if (data.direction == 'recv') {
             TransportManager.createRecvTransport({
                 id: data.id,
@@ -51,11 +56,12 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
                 dtlsParameters: data.dtlsParameters,
             });
 
+            socket.emit(CLIENT_EVENTS.MEDIA_PRODUCING, {
+                direction: "recv"
+            })
+
         }
 
-        socket.emit(CLIENT_EVENTS.MEDIA_PRODUCING, {
-            direction: "send"
-        })
 
     })
 
@@ -73,6 +79,9 @@ export const registerWebRTCHandlers = async (socket: Socket) => {
 
         // state.setMeetingSync(data)
         useMeetingStore.getState().setMeetingParticipants(data.participants);
+
+        //* * here we make the event file for all participant producer consume except myself.
+        
 
     })
 

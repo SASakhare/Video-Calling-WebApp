@@ -13,7 +13,8 @@ export function registerMediaEvents(io, socket) {
 
             try {
                 console.log("============================== MEDIA CREATE TRANSPORT ======================================");
-
+                console.log(`=========================== direction : ${direction} ===============================`);
+                
                 const participant = RoomService.getParticipantBySocket(socket.id);
                 console.log(participant);
 
@@ -25,7 +26,7 @@ export function registerMediaEvents(io, socket) {
                 const transport = await MediaService.createWebRtcTransport(participant.participantId, direction);
 
 
-                console.log("============================== MEDIA CREATED TRANSPORT ======================================");
+                console.log("==================================== MEDIA CREATED TRANSPORT ======================================");
 
                 socket.emit(SERVER_EVENTS.MEDIA_CREATED_TRANSPORT, {
                     direction,
@@ -154,8 +155,7 @@ export function registerMediaEvents(io, socket) {
     //     }
     // )
 
-    socket.on(
-        CLIENT_EVENTS.MEDIA_PRODUCING,
+    socket.on(CLIENT_EVENTS.MEDIA_PRODUCING,
         async ({ direction }) => {
 
             try {
@@ -220,6 +220,73 @@ export function registerMediaEvents(io, socket) {
     );
 
 
+    socket.on(CLIENT_EVENTS.MEDIA_CONSUME,
+        async ({ direction }) => {
+
+            try {
+
+                console.log("============================== MEDIA PRODUCING ======================================");
+
+                const participant = RoomService.getParticipantBySocket(socket.id);
+
+                if (!participant) {
+                    throw new Error("Participant not found.");
+                }
+
+                // =====================================================
+                // Notify everyone that this participant now has producers
+                // =====================================================
+
+                const roomId = `${participant.getHostId()}:${participant.getMeetingId()}`;
+
+                socket.to(roomId).emit(
+                    SERVER_EVENTS.PARTICIPANT_JOINED,
+                    participant.toDTO()
+                );
+
+                // =====================================================
+                // Meeting Sync
+                // =====================================================
+
+                const room = RoomService.getRoom(
+                    participant.getMeetingId()
+                );
+
+                if (!room) {
+                    throw new Error("Room not found.");
+                }
+
+                const participants = room
+                    .getParticipants()
+                    .map((participant) => participant.toDTO());
+
+                socket.emit(
+                    SERVER_EVENTS.MEETING_SYNC,
+                    {
+                        meetingId: room.getMeetingId(),
+                        participants,
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                socket.emit(
+                    SERVER_EVENTS.MEDIA_ERROR,
+                    {
+                        message: error.message,
+                    }
+                );
+
+            }
+
+        }
+    );
+
+    
+
+
     socket.on(CLIENT_EVENTS.MEDIA_CONNECT_TRANSPORT, async ({ direction, dtlsParameters }, callback) => {
 
         try {
@@ -257,8 +324,9 @@ export function registerMediaEvents(io, socket) {
         }
     })
 
-    socket.on(
-        CLIENT_EVENTS.MEDIA_PRODUCE,
+
+
+    socket.on(CLIENT_EVENTS.MEDIA_PRODUCE,
 
         async (
             {
